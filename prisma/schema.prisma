@@ -1,0 +1,180 @@
+// Prisma schema – single source for DB and types.
+// Auth: NextAuth (Google) with Account/Session.
+generator client {
+  provider = "prisma-client-js"
+}
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+// ---------- NextAuth (Google) ----------
+model User {
+  id                 String    @id @default(cuid())
+  name               String?
+  lastname           String?
+  typeIdentification String?   @map("type_identification")
+  identification     String?
+  email              String    @unique
+  emailVerified      DateTime? @map("email_verified")
+  image              String?
+  address            String?
+  phone              String?
+  createdAt          DateTime  @default(now()) @map("created_at")
+  updatedAt          DateTime  @updatedAt @map("updated_at")
+  accounts       Account[]
+  sessions       Session[]
+  roles          UserRole[]
+  businessAdmins BusinessAdmin[]
+}
+model Account {
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@id([provider, providerAccountId])
+  @@map("accounts")
+}
+model Session {
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@map("sessions")
+}
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+  @@id([identifier, token])
+  @@map("verification_tokens")
+}
+// ---------- Roles ----------
+model Role {
+  id    String @id @default(cuid())
+  name  String @unique
+  users UserRole[]
+  @@map("roles")
+}
+model UserRole {
+  userId String
+  roleId String
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role   Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  @@id([userId, roleId])
+  @@map("user_roles")
+}
+// ---------- Regions ----------
+model Region {
+  id        String   @id @default(cuid())
+  name      String
+  image     String?
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  categories RegionCategory[]
+  @@map("regions")
+}
+model RegionCategory {
+  regionId   String   @map("region_id")
+  categoryId String   @map("category_id")
+  region   Region   @relation(fields: [regionId], references: [id], onDelete: Cascade)
+  category Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  @@id([regionId, categoryId])
+  @@map("region_categories")
+}
+// ---------- Categories ----------
+model Category {
+  id        String   @id @default(cuid())
+  name      String
+  tags      String[]
+  image     String?
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  regions     RegionCategory[]
+  businesses BusinessCategory[]
+  products   CategoryProduct[]
+  @@map("categories")
+}
+// ---------- Businesses ----------
+model Business {
+  id               String            @id @default(cuid())
+  name             String
+  slug             String            @unique
+  description      String?
+  address          String?
+  image            String?
+  createdAt        DateTime          @default(now()) @map("created_at")
+  updatedAt        DateTime          @updatedAt @map("updated_at")
+  categories       BusinessCategory[]
+  productCategories ProductCategory[]
+  products         Product[]
+  admins           BusinessAdmin[]
+  @@map("businesses")
+}
+model BusinessCategory {
+  businessId String
+  categoryId String
+  business   Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  @@id([businessId, categoryId])
+  @@map("business_categories")
+}
+// ---------- Product categories (per business, for classifying products) ----------
+model ProductCategory {
+  id          String                 @id @default(cuid())
+  businessId  String                 @map("business_id")
+  name        String
+  image       String?
+  createdAt   DateTime               @default(now()) @map("created_at")
+  updatedAt   DateTime               @updatedAt @map("updated_at")
+  business    Business               @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  products    ProductProductCategory[]
+  @@map("product_categories")
+}
+model ProductProductCategory {
+  productId         String         @map("product_id")
+  productCategoryId String        @map("product_category_id")
+  product           Product        @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productCategory   ProductCategory @relation(fields: [productCategoryId], references: [id], onDelete: Cascade)
+  @@id([productId, productCategoryId])
+  @@map("product_product_categories")
+}
+// ---------- Products ----------
+model Product {
+  id              String   @id @default(cuid())
+  businessId      String   @map("business_id")
+  name            String
+  description     String?
+  price           Decimal? @db.Decimal(10, 2)
+  image           String?
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+  business        Business         @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  categories      CategoryProduct[]
+  productCategories ProductProductCategory[]
+  @@map("products")
+}
+model CategoryProduct {
+  productId  String   @map("product_id")
+  categoryId String   @map("category_id")
+  product    Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  @@id([productId, categoryId])
+  @@map("category_products")
+}
+// ---------- Business admins ----------
+model BusinessAdmin {
+  userId     String   @map("user_id")
+  businessId String   @map("business_id")
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  business Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  @@id([userId, businessId])
+  @@map("business_admins")
+}
