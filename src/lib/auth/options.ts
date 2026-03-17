@@ -2,7 +2,7 @@ import type { NextAuthOptions } from 'next-auth';
 import GoogleProvider from 'next-auth/providers/google';
 import { PrismaAdapter } from '@auth/prisma-adapter';
 import { prisma } from '@/lib/db/prisma';
-import { DEFAULT_ROLE } from './roles';
+import { DEFAULT_ROLE, ROLES } from './roles';
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
@@ -34,11 +34,18 @@ export const authOptions: NextAuthOptions = {
       if (!dbUser) return session;
 
       const roleNames = dbUser.roles.map((ur) => ur.role.name);
+      // Solo al primer login sin roles: únicamente el email en SUPERADMIN_EMAIL recibe superadmin; el resto recibe client.
       if (roleNames.length === 0) {
-        const clientRole = await prisma.role.findUnique({ where: { name: DEFAULT_ROLE } });
-        if (clientRole) {
-          await prisma.userRole.create({ data: { userId: user.id, roleId: clientRole.id } });
-          roleNames.push(DEFAULT_ROLE);
+        const superadminEmail = process.env.SUPERADMIN_EMAIL?.trim().toLowerCase();
+        const isSuperadminEmail =
+          superadminEmail !== undefined &&
+          superadminEmail !== '' &&
+          dbUser.email.toLowerCase() === superadminEmail;
+        const roleToAssign = isSuperadminEmail ? ROLES.SUPERADMIN : DEFAULT_ROLE;
+        const role = await prisma.role.findUnique({ where: { name: roleToAssign } });
+        if (role) {
+          await prisma.userRole.create({ data: { userId: user.id, roleId: role.id } });
+          roleNames.push(roleToAssign);
         }
       }
 
