@@ -1,0 +1,323 @@
+{
+  "roles": [
+    { "id": "cmmu2u71z00005o3zwg7drly9", "name": "superadmin" },
+    { "id": "cmmvd6lo100005orrzobsyn59", "name": "admin" },
+    { "id": "cmmvd6vgj00015orrf1nrukkd", "name": "business" },
+    { "id": "cmmvd72hh00025orr738cknw8", "name": "client" }
+  ],
+  "users": [
+    {
+      "id": "cmmu2sbke0000jj04e51z6fb0",
+      "name": "Nestor Fuenmayor",
+      "lastname": null,
+      "typeIdentification": null,
+      "identification": null,
+      "email": "nfuenma@gmail.com",
+      "emailVerified": null,
+      "image": "https://lh3.googleusercontent.com/a/ACg8ocLp8vnco41HcAweGCoUSiZjgv6oet3adOrMGd9TsJLKqzBFOg=s96-c",
+      "address": null,
+      "phone": null,
+      "createdAt": "2026-03-17T03:51:27.374Z",
+      "updatedAt": "2026-03-17T03:51:27.374Z"
+    },
+    {
+      "id": "cmmuogmvb0000l404a85q72s2",
+      "name": "DIMARK Digital",
+      "lastname": null,
+      "typeIdentification": null,
+      "identification": null,
+      "email": "dimarkdigital5.0@gmail.com",
+      "emailVerified": null,
+      "image": "https://lh3.googleusercontent.com/a/ACg8ocJFqG1OMuk5aAFpqCjjtcfc46fyunZAV0WlxPDA8ifrYRQdeg=s96-c",
+      "address": null,
+      "phone": null,
+      "createdAt": "2026-03-17T13:58:13.703Z",
+      "updatedAt": "2026-03-17T13:58:13.703Z"
+    }
+  ],
+  "accounts": [
+    {
+      "userId": "cmmu2sbke0000jj04e51z6fb0",
+      "type": "oauth",
+      "provider": "google",
+      "providerAccountId": "103705326840472479886",
+      "expires_at": 1773723085,
+      "token_type": "Bearer",
+      "scope": "openid https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email",
+      "session_state": null
+    },
+    {
+      "userId": "cmmuogmvb0000l404a85q72s2",
+      "type": "oauth",
+      "provider": "google",
+      "providerAccountId": "101302919210798513033",
+      "expires_at": 1773759492,
+      "token_type": "Bearer",
+      "scope": "https://www.googleapis.com/auth/userinfo.email openid https://www.googleapis.com/auth/userinfo.profile",
+      "session_state": null
+    }
+  ],
+  "sessions": [
+    {
+      "userId": "cmmuogmvb0000l404a85q72s2",
+      "expires": "2026-04-16T13:58:13.743Z"
+    },
+    {
+      "userId": "cmmu2sbke0000jj04e51z6fb0",
+      "expires": "2026-04-17T00:27:12.297Z"
+    },
+    {
+      "userId": "cmmu2sbke0000jj04e51z6fb0",
+      "expires": "2026-04-17T00:46:27.030Z"
+    }
+  ],
+  "userRoles": [
+    {
+      "userId": "cmmu2sbke0000jj04e51z6fb0",
+      "roleId": "cmmu2u71z00005o3zwg7drly9"
+    },
+    {
+      "userId": "cmmuogmvb0000l404a85q72s2",
+      "roleId": "cmmu2u71z00005o3zwg7drly9"
+    }
+  ],
+  "regions": [
+    {
+      "id": "cmmuzlsy80003l50479zaw6vh",
+      "name": "Charallave",
+      "image": null,
+      "createdAt": "2026-03-17T19:10:10.641Z",
+      "updatedAt": "2026-03-17T19:27:05.234Z"
+    },
+    {
+      "id": "cmmuzljy20002l504ozlllf4i",
+      "name": "Cua",
+      "image": null,
+      "createdAt": "2026-03-17T19:09:58.971Z",
+      "updatedAt": "2026-03-17T19:27:11.268Z"
+    },
+    {
+      "id": "cmmuzlb150001l5046ssdz6ym",
+      "name": "Ocumare",
+      "image": null,
+      "createdAt": "2026-03-17T19:09:47.417Z",
+      "updatedAt": "2026-03-17T19:27:16.009Z"
+    },
+    {
+      "id": "cmmu2wybv0000l50482fp3xm3",
+      "name": "Santa Teresa del tuy",
+      "image": "https://scontent.fbaq5-1.fna.fbcdn.net/v/t1.6435-9/208122908_989069815188675_2503302540369088809_n.jpg?_nc_cat=100&ccb=1-7&_nc_sid=13d280&_nc_eui2=AeGcdNV0lhLImsk3bEhn-mIPZgPGf4-IQotmA8Z_j4hCi8x88r_FyMOZBBTgeCFn8rsHJsnDA_Xll1P8oTdfYfTN&_nc_ohc=SzaaXCDqzKkQ7kNvwHf-7P1&_nc_oc=AdmTqM041McEU9s4eOK_2Pu0Y4V_ymbL2LEloTuIhqUmkIlk0KQbuofA_3vmIaP0lb0&_nc_zt=23&_nc_ht=scontent.fbaq5-1.fna&_nc_gid=zyi3f4a0yS8z5LvAp3kx9A&_nc_ss=8&oh=00_Afy5aEm20FYOUvbwopEiayn6ZFtMVxvME-Xd4N4rtVaHBg&oe=69E0464B",
+      "createdAt": "2026-03-17T03:55:03.499Z",
+      "updatedAt": "2026-03-17T19:27:22.850Z"
+    },
+    {
+      "id": "cmmuoxjld0000l504t3roevca",
+      "name": "Santa lucian",
+      "image": null,
+      "createdAt": "2026-03-17T14:11:22.609Z",
+      "updatedAt": "2026-03-17T19:27:27.853Z"
+    },
+    {
+      "id": "cmmuzkzkq0000l504nj2aacnm",
+      "name": "Yare",
+      "image": null,
+      "createdAt": "2026-03-17T19:09:32.571Z",
+      "updatedAt": "2026-03-17T19:27:32.904Z"
+    }
+  ],
+  "categories": [
+    {
+      "id": "cmmuzvf5q0005l504wlekk88c",
+      "name": "Movilidad",
+      "tags": [],
+      "image": null,
+      "createdAt": "2026-03-17T19:17:39.153Z",
+      "updatedAt": "2026-03-17T19:17:39.153Z"
+    },
+    {
+      "id": "cmmuzvkun0006l5046los3ife",
+      "name": "Delivery",
+      "tags": [],
+      "image": null,
+      "createdAt": "2026-03-17T19:17:46.704Z",
+      "updatedAt": "2026-03-17T19:17:46.704Z"
+    },
+    {
+      "id": "cmmuzvzlr0007l504ct7fzolq",
+      "name": "Mandaditos",
+      "tags": [],
+      "image": null,
+      "createdAt": "2026-03-17T19:18:05.823Z",
+      "updatedAt": "2026-03-17T19:18:05.823Z"
+    },
+    {
+      "id": "cmmuzw85t0008l504rher2ihi",
+      "name": "Comercios",
+      "tags": [],
+      "image": null,
+      "createdAt": "2026-03-17T19:18:16.913Z",
+      "updatedAt": "2026-03-17T19:18:16.913Z"
+    },
+    {
+      "id": "cmmuzwhmj0009l504p8ujup74",
+      "name": "Servicio profesionales",
+      "tags": [],
+      "image": null,
+      "createdAt": "2026-03-17T19:18:29.180Z",
+      "updatedAt": "2026-03-17T19:18:29.180Z"
+    },
+    {
+      "id": "cmmuzwugx000al504y71nroir",
+      "name": "Educación y formación",
+      "tags": [],
+      "image": null,
+      "createdAt": "2026-03-17T19:18:45.826Z",
+      "updatedAt": "2026-03-17T19:18:45.826Z"
+    },
+    {
+      "id": "cmmuzxbhg000bl504bn9oqcob",
+      "name": "Publicidad Marketing & Diseños",
+      "tags": [],
+      "image": null,
+      "createdAt": "2026-03-17T19:19:07.876Z",
+      "updatedAt": "2026-03-17T19:19:07.876Z"
+    }
+  ],
+  "businesses": [
+    {
+      "id": "cmmu2zbyw0002l5044n0nei06",
+      "name": "Autoperiquitos La Guliana",
+      "slug": "a",
+      "description": null,
+      "address": "Aqui",
+      "image": "https://asopartes.com/wp-content/uploads/2023/04/repuestos-originales-para-vehiculos-autos-motos.jpg",
+      "createdAt": "2026-03-17T03:56:54.488Z",
+      "updatedAt": "2026-03-17T03:56:54.488Z"
+    }
+  ],
+  "businessCategories": [],
+  "regionCategories": [
+    {
+      "regionId": "cmmuzlsy80003l50479zaw6vh",
+      "categoryId": "cmmuzw85t0008l504rher2ihi"
+    },
+    {
+      "regionId": "cmmuzlsy80003l50479zaw6vh",
+      "categoryId": "cmmuzvkun0006l5046los3ife"
+    },
+    {
+      "regionId": "cmmuzlsy80003l50479zaw6vh",
+      "categoryId": "cmmuzwugx000al504y71nroir"
+    },
+    {
+      "regionId": "cmmuzlsy80003l50479zaw6vh",
+      "categoryId": "cmmuzvzlr0007l504ct7fzolq"
+    },
+    {
+      "regionId": "cmmuzljy20002l504ozlllf4i",
+      "categoryId": "cmmuzwhmj0009l504p8ujup74"
+    },
+    {
+      "regionId": "cmmuzljy20002l504ozlllf4i",
+      "categoryId": "cmmuzxbhg000bl504bn9oqcob"
+    },
+    {
+      "regionId": "cmmuzljy20002l504ozlllf4i",
+      "categoryId": "cmmuzwugx000al504y71nroir"
+    },
+    {
+      "regionId": "cmmuzlb150001l5046ssdz6ym",
+      "categoryId": "cmmuzvf5q0005l504wlekk88c"
+    },
+    {
+      "regionId": "cmmuzlb150001l5046ssdz6ym",
+      "categoryId": "cmmuzvzlr0007l504ct7fzolq"
+    },
+    {
+      "regionId": "cmmuzlb150001l5046ssdz6ym",
+      "categoryId": "cmmuzwugx000al504y71nroir"
+    },
+    {
+      "regionId": "cmmu2wybv0000l50482fp3xm3",
+      "categoryId": "cmmuzvf5q0005l504wlekk88c"
+    },
+    {
+      "regionId": "cmmu2wybv0000l50482fp3xm3",
+      "categoryId": "cmmuzwhmj0009l504p8ujup74"
+    },
+    {
+      "regionId": "cmmu2wybv0000l50482fp3xm3",
+      "categoryId": "cmmuzwugx000al504y71nroir"
+    },
+    {
+      "regionId": "cmmu2wybv0000l50482fp3xm3",
+      "categoryId": "cmmuzxbhg000bl504bn9oqcob"
+    },
+    {
+      "regionId": "cmmu2wybv0000l50482fp3xm3",
+      "categoryId": "cmmuzw85t0008l504rher2ihi"
+    },
+    {
+      "regionId": "cmmu2wybv0000l50482fp3xm3",
+      "categoryId": "cmmuzvkun0006l5046los3ife"
+    },
+    {
+      "regionId": "cmmu2wybv0000l50482fp3xm3",
+      "categoryId": "cmmuzvzlr0007l504ct7fzolq"
+    },
+    {
+      "regionId": "cmmuoxjld0000l504t3roevca",
+      "categoryId": "cmmuzw85t0008l504rher2ihi"
+    },
+    {
+      "regionId": "cmmuoxjld0000l504t3roevca",
+      "categoryId": "cmmuzxbhg000bl504bn9oqcob"
+    },
+    {
+      "regionId": "cmmuzkzkq0000l504nj2aacnm",
+      "categoryId": "cmmuzwhmj0009l504p8ujup74"
+    },
+    {
+      "regionId": "cmmuzkzkq0000l504nj2aacnm",
+      "categoryId": "cmmuzwugx000al504y71nroir"
+    },
+    {
+      "regionId": "cmmuzkzkq0000l504nj2aacnm",
+      "categoryId": "cmmuzxbhg000bl504bn9oqcob"
+    },
+    {
+      "regionId": "cmmuzkzkq0000l504nj2aacnm",
+      "categoryId": "cmmuzvkun0006l5046los3ife"
+    }
+  ],
+  "productCategories": [
+    {
+      "id": "cmmu2zwlf0004l504uphm7ytz",
+      "businessId": "cmmu2zbyw0002l5044n0nei06",
+      "name": "Gomas",
+      "image": null,
+      "createdAt": "2026-03-17T03:57:21.219Z",
+      "updatedAt": "2026-03-17T03:57:21.219Z"
+    }
+  ],
+  "products": [
+    {
+      "id": "cmmu30nky0006l5049430qoud",
+      "businessId": "cmmu2zbyw0002l5044n0nei06",
+      "name": "Goma de chasis",
+      "description": null,
+      "price": 100,
+      "image": "https://resources.claroshop.com/medios-plazavip/s2/69046/4529651/63f47071ccd32-0945-1600x1600.jpg?scale=700&qlty=80",
+      "createdAt": "2026-03-17T03:57:56.194Z",
+      "updatedAt": "2026-03-17T03:58:31.117Z"
+    }
+  ],
+  "categoryProducts": [],
+  "productProductCategories": [
+    {
+      "productId": "cmmu30nky0006l5049430qoud",
+      "productCategoryId": "cmmu2zwlf0004l504uphm7ytz"
+    }
+  ],
+  "businessAdmins": []
+}

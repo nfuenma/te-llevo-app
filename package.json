@@ -12,7 +12,8 @@
     "db:push": "prisma db push",
     "db:migrate": "prisma migrate dev",
     "db:studio": "prisma studio",
-    "db:seed": "npx prisma db seed"
+    "db:seed": "npx prisma db seed",
+    "db:seed-export": "npx tsx prisma/export-seed-data.ts"
   },
   "prisma": {
     "seed": "npx tsx prisma/seed.ts"

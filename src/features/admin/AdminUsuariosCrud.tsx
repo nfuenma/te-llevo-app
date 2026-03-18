@@ -31,9 +31,22 @@ import CircularProgress from '@mui/material/CircularProgress';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
+import AddIcon from '@mui/icons-material/Add';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import Avatar from '@mui/material/Avatar';
+import Accordion from '@mui/material/Accordion';
+import AccordionSummary from '@mui/material/AccordionSummary';
+import AccordionDetails from '@mui/material/AccordionDetails';
+import TextField from '@mui/material/TextField';
 import { useListUsers, useUpdateUser } from '@/hooks/api/users';
-import { useListRoles } from '@/hooks/api/roles';
+import {
+  useListRoles,
+  useCreateRole,
+  useUpdateRole,
+  useDeleteRole,
+  type RoleOption,
+} from '@/hooks/api/roles';
 import { useListBusinesses } from '@/hooks/api/businesses';
 import type { UserWithRolesAndBusinesses } from '@/lib/sdk/types';
 
@@ -42,6 +55,11 @@ export function AdminUsuariosCrud() {
   const [selectedUser, setSelectedUser] = useState<UserWithRolesAndBusinesses | null>(null);
   const [roleIds, setRoleIds] = useState<string[]>([]);
   const [businessIds, setBusinessIds] = useState<string[]>([]);
+  const [openRoleDialog, setOpenRoleDialog] = useState(false);
+  const [roleForm, setRoleForm] = useState<{ id: string | null; name: string }>({
+    id: null,
+    name: '',
+  });
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
@@ -49,6 +67,9 @@ export function AdminUsuariosCrud() {
   const { data: roles } = useListRoles();
   const { data: businesses } = useListBusinesses();
   const updateMutation = useUpdateUser();
+  const createRoleMutation = useCreateRole();
+  const updateRoleMutation = useUpdateRole();
+  const deleteRoleMutation = useDeleteRole();
 
   const handleOpenEdit = (user: UserWithRolesAndBusinesses) => {
     setSelectedUser(user);
@@ -80,7 +101,40 @@ export function AdminUsuariosCrud() {
     handleClose();
   };
 
+  const handleOpenCreateRole = () => {
+    setRoleForm({ id: null, name: '' });
+    setOpenRoleDialog(true);
+  };
+
+  const handleOpenEditRole = (role: RoleOption) => {
+    setRoleForm({ id: role.id, name: role.name });
+    setOpenRoleDialog(true);
+  };
+
+  const handleCloseRoleDialog = () => {
+    setOpenRoleDialog(false);
+    setRoleForm({ id: null, name: '' });
+  };
+
+  const handleSubmitRole = async () => {
+    const name = roleForm.name.trim();
+    if (!name) return;
+    if (roleForm.id) {
+      await updateRoleMutation.mutateAsync({ id: roleForm.id, name });
+    } else {
+      await createRoleMutation.mutateAsync({ name });
+    }
+    handleCloseRoleDialog();
+  };
+
+  const handleDeleteRole = async (role: RoleOption) => {
+    if (typeof window !== 'undefined' && !window.confirm(`¿Eliminar el rol "${role.name}"?`)) return;
+    await deleteRoleMutation.mutateAsync(role.id);
+  };
+
   const isSubmitting = updateMutation.isPending;
+  const isRoleSubmitting =
+    createRoleMutation.isPending || updateRoleMutation.isPending;
 
   if (isLoading) {
     return (
@@ -92,6 +146,65 @@ export function AdminUsuariosCrud() {
 
   return (
     <>
+      <Accordion variant="outlined" sx={{ mb: 2 }}>
+        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+          <Typography variant="subtitle1">Gestionar roles del sistema</Typography>
+        </AccordionSummary>
+        <AccordionDetails>
+          <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 1 }}>
+            <Button
+              size="small"
+              variant="outlined"
+              startIcon={<AddIcon />}
+              onClick={handleOpenCreateRole}
+            >
+              Nuevo rol
+            </Button>
+          </Box>
+          <TableContainer component={Paper} variant="outlined">
+            <Table size="small">
+              <TableHead>
+                <TableRow>
+                  <TableCell>Nombre</TableCell>
+                  <TableCell align="right" width={100}>
+                    Acciones
+                  </TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {roles?.map((role) => (
+                  <TableRow key={role.id}>
+                    <TableCell>{role.name}</TableCell>
+                    <TableCell align="right">
+                      <IconButton
+                        size="small"
+                        onClick={() => handleOpenEditRole(role)}
+                        aria-label="Editar rol"
+                      >
+                        <EditIcon fontSize="small" />
+                      </IconButton>
+                      <IconButton
+                        size="small"
+                        onClick={() => handleDeleteRole(role)}
+                        aria-label="Eliminar rol"
+                        color="error"
+                      >
+                        <DeleteIcon fontSize="small" />
+                      </IconButton>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+          {roles?.length === 0 && (
+            <Typography variant="body2" color="text.secondary" sx={{ py: 2, textAlign: 'center' }}>
+              No hay roles. Crea uno con «Nuevo rol».
+            </Typography>
+          )}
+        </AccordionDetails>
+      </Accordion>
+
       {isMobile ? (
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
           {users?.map((user) => (
@@ -196,17 +309,17 @@ export function AdminUsuariosCrud() {
 
       <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
         <DialogTitle>
-          Editar usuario {selectedUser ? [selectedUser.name, selectedUser.lastname].filter(Boolean).join(' ') || selectedUser.email : ''}
+          Asignar roles y negocios — {selectedUser ? [selectedUser.name, selectedUser.lastname].filter(Boolean).join(' ') || selectedUser.email : ''}
         </DialogTitle>
         <DialogContent>
           {selectedUser && (
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, pt: 1 }}>
-              <Typography variant="body2" color="text.secondary">
-                {selectedUser.email}
-              </Typography>
               <FormControl component="fieldset">
                 <Typography variant="subtitle2" gutterBottom>
                   Roles
+                </Typography>
+                <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 1 }}>
+                  Marca uno o más roles para este usuario (superadmin, admin, business, client).
                 </Typography>
                 <FormGroup row>
                   {roles?.map((role) => (
@@ -223,6 +336,9 @@ export function AdminUsuariosCrud() {
                   ))}
                 </FormGroup>
               </FormControl>
+              <Typography variant="body2" color="text.secondary">
+                Usuario: {selectedUser.email}
+              </Typography>
               <FormControl fullWidth size="small">
                 <InputLabel>Negocios que puede gestionar</InputLabel>
                 <Select
@@ -255,6 +371,32 @@ export function AdminUsuariosCrud() {
           <Button onClick={handleClose}>Cancelar</Button>
           <Button onClick={handleSubmit} variant="contained" disabled={isSubmitting}>
             Guardar
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog open={openRoleDialog} onClose={handleCloseRoleDialog} maxWidth="xs" fullWidth>
+        <DialogTitle>{roleForm.id ? 'Editar rol' : 'Nuevo rol'}</DialogTitle>
+        <DialogContent>
+          <TextField
+            autoFocus
+            margin="dense"
+            label="Nombre"
+            value={roleForm.name}
+            onChange={(e) => setRoleForm((prev) => ({ ...prev, name: e.target.value }))}
+            fullWidth
+            variant="outlined"
+            size="small"
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseRoleDialog}>Cancelar</Button>
+          <Button
+            onClick={handleSubmitRole}
+            variant="contained"
+            disabled={isRoleSubmitting || !roleForm.name.trim()}
+          >
+            {roleForm.id ? 'Guardar' : 'Crear'}
           </Button>
         </DialogActions>
       </Dialog>

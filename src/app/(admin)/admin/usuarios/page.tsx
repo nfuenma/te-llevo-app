@@ -9,7 +9,7 @@ export default function AdminUsuariosPage() {
         Usuarios
       </Typography>
       <Typography color="text.secondary" paragraph>
-        Asigna roles (superadmin, admin, business, client) y los negocios que cada usuario puede gestionar. Solo superadmin puede ver esta sección.
+        En «Gestionar roles del sistema» puedes crear, editar y eliminar roles. Luego asigna esos roles a cada usuario con el botón de editar. Solo superadmin puede ver esta sección.
       </Typography>
       <AdminUsuariosCrud />
     </Box>
