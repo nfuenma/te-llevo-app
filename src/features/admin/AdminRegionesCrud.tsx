@@ -1,6 +1,8 @@
 'use client';
 
 import { useState } from 'react';
+import { useTheme } from '@mui/material/styles';
+import useMediaQuery from '@mui/material/useMediaQuery';
 import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
 import Table from '@mui/material/Table';
@@ -10,6 +12,9 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
+import CardActions from '@mui/material/CardActions';
 import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
@@ -42,6 +47,8 @@ const emptyForm: FormState = { id: null, name: '', image: '', categoryIds: [] };
 export function AdminRegionesCrud() {
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState<FormState>(emptyForm);
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
   const { data: regions, isLoading } = useListRegions();
   const { data: categories } = useListCategories();
@@ -116,23 +123,12 @@ export function AdminRegionesCrud() {
           Nueva región
         </Button>
       </Box>
-      <TableContainer component={Paper} variant="outlined">
-        <Table size="small">
-          <TableHead>
-            <TableRow>
-              <TableCell>Nombre</TableCell>
-              <TableCell>Imagen</TableCell>
-              <TableCell>Categorías</TableCell>
-              <TableCell align="right" width={120}>
-                Acciones
-              </TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {regions?.map((row) => (
-              <TableRow key={row.id}>
-                <TableCell>{row.name}</TableCell>
-                <TableCell>
+      {isMobile ? (
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+          {regions?.map((row) => (
+            <Card key={row.id} variant="outlined">
+              <CardContent sx={{ '&:last-child': { pb: 1 } }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 0.5 }}>
                   {row.image ? (
                     <Box
                       component="img"
@@ -140,33 +136,86 @@ export function AdminRegionesCrud() {
                       alt=""
                       sx={{ width: 40, height: 40, objectFit: 'cover', borderRadius: 1 }}
                     />
-                  ) : (
-                    '—'
-                  )}
-                </TableCell>
-                <TableCell>
+                  ) : null}
+                  <Typography variant="subtitle1" fontWeight="medium">
+                    {row.name}
+                  </Typography>
+                </Box>
+                <Typography variant="body2" color="text.secondary">
                   {row.categories?.length
                     ? row.categories.map((rc) => rc.category.name).join(', ')
-                    : '—'}
-                </TableCell>
-                <TableCell align="right">
-                  <IconButton size="small" onClick={() => handleOpenEdit(row)} aria-label="Editar">
-                    <EditIcon fontSize="small" />
-                  </IconButton>
-                  <IconButton
-                    size="small"
-                    color="error"
-                    onClick={() => handleDelete(row.id)}
-                    aria-label="Eliminar"
-                  >
-                    <DeleteIcon fontSize="small" />
-                  </IconButton>
+                    : 'Sin categorías'}
+                </Typography>
+              </CardContent>
+              <CardActions sx={{ justifyContent: 'flex-end', pt: 0 }}>
+                <IconButton size="small" onClick={() => handleOpenEdit(row)} aria-label="Editar">
+                  <EditIcon fontSize="small" />
+                </IconButton>
+                <IconButton
+                  size="small"
+                  color="error"
+                  onClick={() => handleDelete(row.id)}
+                  aria-label="Eliminar"
+                >
+                  <DeleteIcon fontSize="small" />
+                </IconButton>
+              </CardActions>
+            </Card>
+          ))}
+        </Box>
+      ) : (
+        <TableContainer component={Paper} variant="outlined">
+          <Table size="small">
+            <TableHead>
+              <TableRow>
+                <TableCell>Nombre</TableCell>
+                <TableCell>Imagen</TableCell>
+                <TableCell>Categorías</TableCell>
+                <TableCell align="right" width={120}>
+                  Acciones
                 </TableCell>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+            </TableHead>
+            <TableBody>
+              {regions?.map((row) => (
+                <TableRow key={row.id}>
+                  <TableCell>{row.name}</TableCell>
+                  <TableCell>
+                    {row.image ? (
+                      <Box
+                        component="img"
+                        src={row.image}
+                        alt=""
+                        sx={{ width: 40, height: 40, objectFit: 'cover', borderRadius: 1 }}
+                      />
+                    ) : (
+                      '—'
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    {row.categories?.length
+                      ? row.categories.map((rc) => rc.category.name).join(', ')
+                      : '—'}
+                  </TableCell>
+                  <TableCell align="right">
+                    <IconButton size="small" onClick={() => handleOpenEdit(row)} aria-label="Editar">
+                      <EditIcon fontSize="small" />
+                    </IconButton>
+                    <IconButton
+                      size="small"
+                      color="error"
+                      onClick={() => handleDelete(row.id)}
+                      aria-label="Eliminar"
+                    >
+                      <DeleteIcon fontSize="small" />
+                    </IconButton>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      )}
       {regions?.length === 0 && (
         <Typography color="text.secondary" sx={{ py: 3, textAlign: 'center' }}>
           No hay regiones. Crea una con el botón «Nueva región».

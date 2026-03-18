@@ -1,6 +1,8 @@
 'use client';
 
 import { useState } from 'react';
+import { useTheme } from '@mui/material/styles';
+import useMediaQuery from '@mui/material/useMediaQuery';
 import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
 import Table from '@mui/material/Table';
@@ -10,6 +12,10 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
+import CardActions from '@mui/material/CardActions';
+import Typography from '@mui/material/Typography';
 import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
@@ -57,6 +63,8 @@ const emptyForm: FormState = {
 export function AdminProductosCrud() {
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState<FormState>(emptyForm);
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
   const { data: products, isLoading } = useListProducts();
   const { data: businesses } = useListBusinesses();
@@ -163,42 +171,75 @@ export function AdminProductosCrud() {
           </Button>
         </Box>
       )}
-      <TableContainer component={Paper} variant="outlined">
-        <Table size="small">
-          <TableHead>
-            <TableRow>
-              <TableCell>Nombre</TableCell>
-              <TableCell>Negocio</TableCell>
-              <TableCell align="right">Precio</TableCell>
-              <TableCell align="right" width={120}>
-                Acciones
-              </TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {products?.map((row) => (
-              <TableRow key={row.id}>
-                <TableCell>{row.name}</TableCell>
-                <TableCell>{row.business?.name ?? '—'}</TableCell>
-                <TableCell align="right">{row.price != null ? String(row.price) : '—'}</TableCell>
-                <TableCell align="right">
-                  <IconButton size="small" onClick={() => handleOpenEdit(row)} aria-label="Editar">
-                    <EditIcon fontSize="small" />
-                  </IconButton>
-                  <IconButton
-                    size="small"
-                    color="error"
-                    onClick={() => handleDelete(row.id)}
-                    aria-label="Eliminar"
-                  >
-                    <DeleteIcon fontSize="small" />
-                  </IconButton>
+      {isMobile ? (
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+          {products?.map((row) => (
+            <Card key={row.id} variant="outlined">
+              <CardContent sx={{ '&:last-child': { pb: 1 } }}>
+                <Typography variant="subtitle1" fontWeight="medium">
+                  {row.name}
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  {row.business?.name ?? '—'}
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Precio: {row.price != null ? String(row.price) : '—'}
+                </Typography>
+              </CardContent>
+              <CardActions sx={{ justifyContent: 'flex-end', pt: 0 }}>
+                <IconButton size="small" onClick={() => handleOpenEdit(row)} aria-label="Editar">
+                  <EditIcon fontSize="small" />
+                </IconButton>
+                <IconButton
+                  size="small"
+                  color="error"
+                  onClick={() => handleDelete(row.id)}
+                  aria-label="Eliminar"
+                >
+                  <DeleteIcon fontSize="small" />
+                </IconButton>
+              </CardActions>
+            </Card>
+          ))}
+        </Box>
+      ) : (
+        <TableContainer component={Paper} variant="outlined">
+          <Table size="small">
+            <TableHead>
+              <TableRow>
+                <TableCell>Nombre</TableCell>
+                <TableCell>Negocio</TableCell>
+                <TableCell align="right">Precio</TableCell>
+                <TableCell align="right" width={120}>
+                  Acciones
                 </TableCell>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+            </TableHead>
+            <TableBody>
+              {products?.map((row) => (
+                <TableRow key={row.id}>
+                  <TableCell>{row.name}</TableCell>
+                  <TableCell>{row.business?.name ?? '—'}</TableCell>
+                  <TableCell align="right">{row.price != null ? String(row.price) : '—'}</TableCell>
+                  <TableCell align="right">
+                    <IconButton size="small" onClick={() => handleOpenEdit(row)} aria-label="Editar">
+                      <EditIcon fontSize="small" />
+                    </IconButton>
+                    <IconButton
+                      size="small"
+                      color="error"
+                      onClick={() => handleDelete(row.id)}
+                      aria-label="Eliminar"
+                    >
+                      <DeleteIcon fontSize="small" />
+                    </IconButton>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      )}
       {products?.length === 0 && (businesses?.length ?? 0) > 0 && (
         <Box sx={{ py: 3, textAlign: 'center' }}>
           <Button variant="outlined" startIcon={<AddIcon />} onClick={handleOpenCreate}>

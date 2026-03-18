@@ -1,6 +1,8 @@
 'use client';
 
 import { useState } from 'react';
+import { useTheme } from '@mui/material/styles';
+import useMediaQuery from '@mui/material/useMediaQuery';
 import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
 import Table from '@mui/material/Table';
@@ -10,6 +12,9 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
+import CardActions from '@mui/material/CardActions';
 import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
@@ -37,6 +42,8 @@ export function AdminUsuariosCrud() {
   const [selectedUser, setSelectedUser] = useState<UserWithRolesAndBusinesses | null>(null);
   const [roleIds, setRoleIds] = useState<string[]>([]);
   const [businessIds, setBusinessIds] = useState<string[]>([]);
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
   const { data: users, isLoading } = useListUsers();
   const { data: roles } = useListRoles();
@@ -85,60 +92,102 @@ export function AdminUsuariosCrud() {
 
   return (
     <>
-      <TableContainer component={Paper} variant="outlined">
-        <Table size="small">
-          <TableHead>
-            <TableRow>
-              <TableCell>Usuario</TableCell>
-              <TableCell>Email</TableCell>
-              <TableCell>Roles</TableCell>
-              <TableCell>Negocios</TableCell>
-              <TableCell align="right" width={80}>
-                Acciones
-              </TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {users?.map((user) => (
-              <TableRow key={user.id}>
-                <TableCell>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <Avatar
-                      src={user.image ?? undefined}
-                      sx={{ width: 32, height: 32 }}
-                    >
-                      {user.name?.charAt(0) ?? user.email?.charAt(0) ?? '?'}
-                    </Avatar>
-                    <Typography variant="body2">
+      {isMobile ? (
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+          {users?.map((user) => (
+            <Card key={user.id} variant="outlined">
+              <CardContent sx={{ '&:last-child': { pb: 1 } }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 0.5 }}>
+                  <Avatar
+                    src={user.image ?? undefined}
+                    sx={{ width: 40, height: 40 }}
+                  >
+                    {user.name?.charAt(0) ?? user.email?.charAt(0) ?? '?'}
+                  </Avatar>
+                  <Box>
+                    <Typography variant="subtitle1" fontWeight="medium">
                       {[user.name, user.lastname].filter(Boolean).join(' ') || '—'}
                     </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      {user.email}
+                    </Typography>
                   </Box>
-                </TableCell>
-                <TableCell>{user.email}</TableCell>
-                <TableCell>
-                  {user.roles?.length
-                    ? user.roles.map((r) => r.role.name).join(', ')
-                    : '—'}
-                </TableCell>
-                <TableCell>
-                  {user.businessAdmins?.length
-                    ? user.businessAdmins.map((ba) => ba.business.name).join(', ')
-                    : '—'}
-                </TableCell>
-                <TableCell align="right">
-                  <IconButton
-                    size="small"
-                    onClick={() => handleOpenEdit(user)}
-                    aria-label="Editar roles y negocios"
-                  >
-                    <EditIcon fontSize="small" />
-                  </IconButton>
+                </Box>
+                <Typography variant="body2" color="text.secondary">
+                  Roles: {user.roles?.length ? user.roles.map((r) => r.role.name).join(', ') : '—'}
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Negocios: {user.businessAdmins?.length ? user.businessAdmins.map((ba) => ba.business.name).join(', ') : '—'}
+                </Typography>
+              </CardContent>
+              <CardActions sx={{ justifyContent: 'flex-end', pt: 0 }}>
+                <IconButton
+                  size="small"
+                  onClick={() => handleOpenEdit(user)}
+                  aria-label="Editar roles y negocios"
+                >
+                  <EditIcon fontSize="small" />
+                </IconButton>
+              </CardActions>
+            </Card>
+          ))}
+        </Box>
+      ) : (
+        <TableContainer component={Paper} variant="outlined">
+          <Table size="small">
+            <TableHead>
+              <TableRow>
+                <TableCell>Usuario</TableCell>
+                <TableCell>Email</TableCell>
+                <TableCell>Roles</TableCell>
+                <TableCell>Negocios</TableCell>
+                <TableCell align="right" width={80}>
+                  Acciones
                 </TableCell>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+            </TableHead>
+            <TableBody>
+              {users?.map((user) => (
+                <TableRow key={user.id}>
+                  <TableCell>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <Avatar
+                        src={user.image ?? undefined}
+                        sx={{ width: 32, height: 32 }}
+                      >
+                        {user.name?.charAt(0) ?? user.email?.charAt(0) ?? '?'}
+                      </Avatar>
+                      <Typography variant="body2">
+                        {[user.name, user.lastname].filter(Boolean).join(' ') || '—'}
+                      </Typography>
+                    </Box>
+                  </TableCell>
+                  <TableCell>{user.email}</TableCell>
+                  <TableCell>
+                    {user.roles?.length
+                      ? user.roles.map((r) => r.role.name).join(', ')
+                      : '—'}
+                  </TableCell>
+                  <TableCell>
+                    {user.businessAdmins?.length
+                      ? user.businessAdmins.map((ba) => ba.business.name).join(', ')
+                      : '—'}
+                  </TableCell>
+                  <TableCell align="right">
+                    <IconButton
+                      size="small"
+                      onClick={() => handleOpenEdit(user)}
+                      aria-label="Editar roles y negocios"
+                    >
+                      <EditIcon fontSize="small" />
+                    </IconButton>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      )}
       {users?.length === 0 && (
         <Typography color="text.secondary" sx={{ py: 3, textAlign: 'center' }}>
           No hay usuarios (los usuarios aparecen al iniciar sesión con Google).
