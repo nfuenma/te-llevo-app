@@ -39,3 +39,18 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# prisma seed data
+prisma/seed-data.json
+
+# Backup files
+*.bak
+*.backup
+*.backup.*
+*.backup.gz
+*.backup.bz2
+*.backup.xz
+*.backup.tar
+*.backup.tar.gz
+*.backup.tar.bz2
+*.backup.tar.xz
