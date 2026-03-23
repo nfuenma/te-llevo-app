@@ -9,6 +9,7 @@ import { useListBusinesses } from '@/hooks/api/businesses';
 import { useRegion } from '@/hooks/api/regions';
 import { useCategory } from '@/hooks/api/categories';
 import { ItemCard } from '@/components/ui/ItemCard';
+import { CategoryPickerStrip } from '@/components/ui/CategoryPickerStrip';
 import { CatalogLayout } from '@/components/layouts/CatalogLayout';
 
 export default function CategoryBusinessesPage() {
@@ -55,15 +56,16 @@ export default function CategoryBusinessesPage() {
         { label: categoryName, href: `/regiones/${regionId}/categorias/${categoryId}` },
       ]}
     >
-      <Typography color="text.secondary" sx={{ mb: 3 }}>
+      <Typography color="text.secondary" sx={{ mb: 2 }}>
         Negocios en esta categoría. Elige uno para ver sus productos.
       </Typography>
+      <CategoryPickerStrip regionId={regionId} currentCategoryId={categoryId} />
       {!businesses?.length ? (
         <Typography color="text.secondary">No hay negocios en esta categoría.</Typography>
       ) : (
         <Grid container spacing={3}>
           {businesses.map((business) => (
-            <Grid key={business.id} size={{ xs: 12, sm: 6, md: 4 }}>
+            <Grid key={business.id} size={{ xs: 6, sm: 4, md: 4 }}>
               <ItemCard
                 href={`/regiones/${regionId}/categorias/${categoryId}/negocios/${business.id}`}
                 title={business.name}

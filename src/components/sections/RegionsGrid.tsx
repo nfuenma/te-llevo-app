@@ -37,7 +37,7 @@ export function RegionsGrid() {
   return (
     <Grid container spacing={3}>
       {regions.map((region) => (
-        <Grid key={region.id} size={{ xs: 12, sm: 6, md: 4 }}>
+        <Grid key={region.id} size={{ xs: 6, sm: 4, md: 4 }}>
           <ItemCard
             href={`/regiones/${region.id}`}
             title={region.name}

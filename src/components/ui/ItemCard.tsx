@@ -20,7 +20,6 @@ function CardContentInner({ title, image }: { title: string; image?: string | nu
       {image ? (
         <CardMedia
           component="img"
-          height="160"
           image={image}
           alt={title}
           sx={{ objectFit: 'cover' }}
@@ -28,7 +27,6 @@ function CardContentInner({ title, image }: { title: string; image?: string | nu
       ) : (
         <Box
           sx={{
-            height: 160,
             bgcolor: 'action.hover',
             display: 'flex',
             alignItems: 'center',

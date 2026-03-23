@@ -7,7 +7,7 @@ export default function HomePage() {
   return (
     <Container maxWidth="lg" sx={{ py: 3 }}>
       <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
-        Elige una región para ver sus categorías de negocios.
+        Elige una región para ver sus categorías de negocios a.
       </Typography>
       <RegionsGrid />
     </Container>

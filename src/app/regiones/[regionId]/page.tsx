@@ -7,6 +7,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 import Typography from '@mui/material/Typography';
 import { useRegion } from '@/hooks/api/regions';
 import { ItemCard } from '@/components/ui/ItemCard';
+import { RegionPickerStrip } from '@/components/ui/RegionPickerStrip';
 import { CatalogLayout } from '@/components/layouts/CatalogLayout';
 
 export default function RegionCategoriesPage() {
@@ -39,15 +40,16 @@ export default function RegionCategoriesPage() {
       title={region.name}
       breadcrumbs={[{ label: region.name }]}
     >
-      <Typography color="text.secondary" sx={{ mb: 3 }}>
+      <Typography color="text.secondary" sx={{ mb: 2 }}>
         Categorías en esta región. Elige una para ver los negocios.
       </Typography>
+      <RegionPickerStrip currentRegionId={region.id} />
       {categories.length === 0 ? (
         <Typography color="text.secondary">No hay categorías en esta región.</Typography>
       ) : (
         <Grid container spacing={3}>
           {categories.map((cat) => (
-            <Grid key={cat.id} size={{ xs: 12, sm: 6, md: 4 }}>
+            <Grid key={cat.id} size={{ xs: 6, sm: 6, md: 4 }}>
               <ItemCard
                 href={`/regiones/${regionId}/categorias/${cat.id}`}
                 title={cat.name}
