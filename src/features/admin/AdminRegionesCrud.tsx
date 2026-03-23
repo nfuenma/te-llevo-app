@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useRef, useState, type ChangeEvent } from 'react';
 import { useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import Button from '@mui/material/Button';
@@ -26,6 +26,8 @@ import Typography from '@mui/material/Typography';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
+import CloudUploadIcon from '@mui/icons-material/CloudUpload';
+import Alert from '@mui/material/Alert';
 import {
   useListRegions,
   useCreateRegion,
@@ -34,6 +36,7 @@ import {
 } from '@/hooks/api/regions';
 import { useListCategories } from '@/hooks/api/categories';
 import type { RegionWithCategories } from '@/lib/sdk/types';
+import { apiConfig } from '@/lib/sdk/config';
 
 type FormState = {
   id: string | null;
@@ -45,8 +48,11 @@ type FormState = {
 const emptyForm: FormState = { id: null, name: '', image: '', categoryIds: [] };
 
 export function AdminRegionesCrud() {
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState<FormState>(emptyForm);
+  const [uploadLoading, setUploadLoading] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
@@ -56,12 +62,55 @@ export function AdminRegionesCrud() {
   const updateMutation = useUpdateRegion();
   const deleteMutation = useDeleteRegion();
 
+  const uploadUrl = `${apiConfig.baseUrl}/api/upload/regions`;
+
+  const handlePickImage = () => {
+    setUploadError(null);
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = async (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (!file) return;
+    setUploadError(null);
+    setUploadLoading(true);
+    try {
+      const body = new FormData();
+      body.append('file', file);
+      const res = await fetch(uploadUrl, {
+        method: 'POST',
+        body,
+        credentials: 'include',
+      });
+      let data: { url?: string; error?: string } = {};
+      try {
+        data = (await res.json()) as { url?: string; error?: string };
+      } catch {
+        /* vacío */
+      }
+      if (!res.ok) {
+        setUploadError(data.error ?? 'No se pudo subir la imagen');
+        return;
+      }
+      if (data.url) {
+        setForm((f) => ({ ...f, image: data.url }));
+      }
+    } catch {
+      setUploadError('Error de red al subir la imagen');
+    } finally {
+      setUploadLoading(false);
+    }
+  };
+
   const handleOpenCreate = () => {
     setForm(emptyForm);
+    setUploadError(null);
     setOpen(true);
   };
 
   const handleOpenEdit = (row: RegionWithCategories) => {
+    setUploadError(null);
     setForm({
       id: row.id,
       name: row.name,
@@ -74,6 +123,8 @@ export function AdminRegionesCrud() {
   const handleClose = () => {
     setOpen(false);
     setForm(emptyForm);
+    setUploadError(null);
+    setUploadLoading(false);
   };
 
   const handleSubmit = async () => {
@@ -234,14 +285,46 @@ export function AdminRegionesCrud() {
             value={form.name}
             onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
           />
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/jpeg,image/png,image/webp,image/gif"
+            hidden
+            onChange={handleFileChange}
+          />
           <TextField
             margin="dense"
             label="URL imagen"
             fullWidth
-            placeholder="https://..."
+            placeholder="https://... o sube un archivo"
             value={form.image}
             onChange={(e) => setForm((f) => ({ ...f, image: e.target.value }))}
+            helperText="Puedes pegar una URL o subir una foto: se optimiza (máx. 200 KB) y se guarda en Cloudinary."
           />
+          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, alignItems: 'center', mt: 1 }}>
+            <Button
+              variant="outlined"
+              size="small"
+              startIcon={<CloudUploadIcon />}
+              onClick={handlePickImage}
+              disabled={uploadLoading}
+            >
+              {uploadLoading ? 'Optimizando y subiendo…' : 'Subir desde el dispositivo'}
+            </Button>
+            {form.image ? (
+              <Box
+                component="img"
+                src={form.image}
+                alt=""
+                sx={{ width: 72, height: 72, objectFit: 'cover', borderRadius: 1, border: 1, borderColor: 'divider' }}
+              />
+            ) : null}
+          </Box>
+          {uploadError ? (
+            <Alert severity="error" sx={{ mt: 1.5 }} onClose={() => setUploadError(null)}>
+              {uploadError}
+            </Alert>
+          ) : null}
           <Box sx={{ mt: 2 }}>
             <Typography variant="body2" color="text.secondary" gutterBottom>
               Categorías de la región
