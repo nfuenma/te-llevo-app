@@ -93,8 +93,9 @@ export function AdminRegionesCrud() {
         setUploadError(data.error ?? 'No se pudo subir la imagen');
         return;
       }
-      if (data.url) {
-        setForm((f) => ({ ...f, image: data.url }));
+      const url = data.url;
+      if (url) {
+        setForm((f) => ({ ...f, image: url }));
       }
     } catch {
       setUploadError('Error de red al subir la imagen');
