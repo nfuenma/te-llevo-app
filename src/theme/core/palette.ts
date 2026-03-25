@@ -6,6 +6,7 @@ export function getPalette(mode: ThemeMode): PaletteOptions {
   return {
     mode,
     common: themeConfig.palette.common,
+    pickerStripAccents: [...themeConfig.palette.pickerStripAccents],
     primary: p.primary,
     secondary: p.secondary,
     error: p.error,

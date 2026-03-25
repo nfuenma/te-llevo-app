@@ -7,4 +7,12 @@ declare module '@mui/material/styles' {
   interface ThemeOptions {
     customShadows?: CustomShadows;
   }
+
+  interface Palette {
+    /** Acentos espectrales por posición (pickers horizontales, etc.). */
+    pickerStripAccents: string[];
+  }
+  interface PaletteOptions {
+    pickerStripAccents?: string[];
+  }
 }

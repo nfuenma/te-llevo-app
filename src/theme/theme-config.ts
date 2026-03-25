@@ -15,6 +15,19 @@ export const themeConfig = {
       black: '#000000',
       white: '#ffffff',
     },
+    /** Acentos espectrales (misma rampa en light/dark; se exponen en `theme.palette`). */
+    pickerStripAccents: [
+      '#ff002d',
+      '#ff5200',
+      '#ffd200',
+      '#adff00',
+      '#2dff00',
+      '#00ff53',
+      '#00ffd3',
+      '#00acff',
+      '#002dff',
+      '#5300ff',
+    ] as const,
     light: {
       primary: {
         main: '#ffd200',

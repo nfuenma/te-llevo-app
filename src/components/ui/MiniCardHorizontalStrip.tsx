@@ -3,11 +3,9 @@
 import Link from 'next/link';
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
-import CardActionArea from '@mui/material/CardActionArea';
-import CardContent from '@mui/material/CardContent';
-import CardMedia from '@mui/material/CardMedia';
 import CircularProgress from '@mui/material/CircularProgress';
 import Typography from '@mui/material/Typography';
+import { alpha, useTheme } from '@mui/material/styles';
 
 export type MiniCardStripItem = {
   id: string;
@@ -15,7 +13,7 @@ export type MiniCardStripItem = {
   image?: string | null;
 };
 
-const CARD_IMAGE_HEIGHT = 56;
+const STRIP_ITEM_MIN_HEIGHT = 120;
 
 type MiniCardHorizontalStripProps = {
   items: MiniCardStripItem[];
@@ -25,6 +23,47 @@ type MiniCardHorizontalStripProps = {
   isLoading?: boolean;
 };
 
+function StripCardMedia({
+  name,
+  image,
+}: {
+  name: string;
+  image?: string | null;
+}) {
+  return (
+    <Box
+      sx={{
+        flex: 1,
+        minHeight: 0,
+        borderRadius: 2,
+        overflow: 'hidden',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        bgcolor: image ? undefined : 'action.hover',
+      }}
+    >
+      {image ? (
+        <Box
+          component="img"
+          src={image}
+          alt={name}
+          sx={{
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',
+            display: 'block',
+          }}
+        />
+      ) : (
+        <Typography variant="subtitle2" color="text.secondary">
+          {name.charAt(0)}
+        </Typography>
+      )}
+    </Box>
+  );
+}
+
 export function MiniCardHorizontalStrip({
   items,
   currentId,
@@ -32,6 +71,9 @@ export function MiniCardHorizontalStrip({
   ariaLabel,
   isLoading,
 }: MiniCardHorizontalStripProps) {
+  const theme = useTheme();
+  const { pickerStripAccents } = theme.palette;
+
   if (isLoading) {
     return (
       <Box
@@ -39,7 +81,7 @@ export function MiniCardHorizontalStrip({
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          minHeight: CARD_IMAGE_HEIGHT + 48,
+          minHeight: STRIP_ITEM_MIN_HEIGHT,
           mb: 2,
         }}
       >
@@ -63,7 +105,6 @@ export function MiniCardHorizontalStrip({
         gap: 1,
         width: '100%',
         overflowX: 'auto',
-        pb: 0.5,
         mb: 3,
         scrollSnapType: { xs: 'x mandatory', sm: 'none' },
         WebkitOverflowScrolling: 'touch',
@@ -75,12 +116,16 @@ export function MiniCardHorizontalStrip({
         },
       }}
     >
-      {items.map((item) => {
+      {items.map((item, index) => {
         const selected = item.id === currentId;
+        const accentRamp =
+          pickerStripAccents.length > 0
+            ? pickerStripAccents
+            : [theme.palette.primary.main];
+        const accent = accentRamp[index % accentRamp.length];
         return (
           <Box
             key={item.id}
-            role="listitem"
             sx={(theme) => ({
               flex: '0 0 auto',
               width: `calc((100% - ${theme.spacing(3)}) / 4)`,
@@ -88,70 +133,50 @@ export function MiniCardHorizontalStrip({
               scrollSnapAlign: 'start',
             })}
           >
-            <Card
-              variant="outlined"
-              sx={{
-                height: '100%',
-                display: 'flex',
-                flexDirection: 'column',
-                transition: 'box-shadow 0.2s, border-color 0.2s',
-                borderWidth: 2,
-                borderColor: selected ? 'primary.main' : 'divider',
-                ...(selected && { bgcolor: 'action.selected' }),
-                '&:hover': { boxShadow: 2 },
-              }}
+            <Link
+              href={getHref(item.id)}
+              style={{ textDecoration: 'none', color: 'inherit' }}
             >
-              <CardActionArea
-                component={Link}
-                href={getHref(item.id)}
-                sx={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'stretch',
-                  flexGrow: 1,
-                }}
-              >
-                {item.image ? (
-                  <CardMedia
-                    component="img"
-                    image={item.image}
-                    alt={item.name}
-                    sx={{
-                      height: CARD_IMAGE_HEIGHT,
-                      objectFit: 'cover',
-                    }}
-                  />
-                ) : (
-                  <Box
-                    sx={{
-                      height: CARD_IMAGE_HEIGHT,
-                      bgcolor: 'action.hover',
+              <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
+                <Card
+                  variant="outlined"
+                  sx={(theme) => {
+                    const idleAlpha = theme.palette.mode === 'dark' ? 0.5 : 0.8;
+                    const selectedAlpha = theme.palette.mode === 'dark' ? 0.7 : 0.8;
+                    return {
+                      width: '100%',
+                      aspectRatio: '1 / 1',
                       display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                    }}
-                  >
-                    <Typography variant="subtitle2" color="text.secondary">
-                      {item.name.charAt(0)}
-                    </Typography>
-                  </Box>
-                )}
-                <CardContent sx={{ py: 0.75, px: 0.75, '&:last-child': { pb: 0.75 } }}>
-                  <Typography
-                    variant="caption"
-                    component="span"
-                    display="block"
-                    textAlign="center"
-                    fontWeight={selected ? 600 : 500}
-                    color={selected ? 'primary' : 'text.primary'}
-                    noWrap
-                    title={item.name}
-                  >
-                    {item.name}
-                  </Typography>
-                </CardContent>
-              </CardActionArea>
-            </Card>
+                      flexDirection: 'column',
+                      p: 1,
+                      borderRadius: 3,
+                      padding: 1.5,
+                      borderColor: selected ? accent : 'transparent',
+                      bgcolor: alpha(accent, selected ? selectedAlpha : idleAlpha),
+                      '&:hover': { borderColor: accent },
+                    };
+                  }}
+                >
+                  <StripCardMedia name={item.name} image={item.image} />
+                </Card>
+                <Typography
+                  variant="caption"
+                  component="span"
+                  display="block"
+                  textAlign="center"
+                  fontWeight={selected ? 600 : 500}
+                  color={selected ? undefined : 'text.primary'}
+                  sx={{
+                    mt: 0.75,
+                    ...(selected && { color: accent }),
+                  }}
+                  noWrap
+                  title={item.name}
+                >
+                  {item.name}
+                </Typography>
+              </Box>
+            </Link>
           </Box>
         );
       })}
