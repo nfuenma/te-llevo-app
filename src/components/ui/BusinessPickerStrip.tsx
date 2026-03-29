@@ -1,6 +1,7 @@
 'use client';
 
-import { useListBusinesses } from '@/hooks/api/businesses';
+import { useLayoutEffect } from 'react';
+import { useBusinesses } from '@/contexts';
 import { MiniCardHorizontalStrip } from '@/components/ui/MiniCardHorizontalStrip';
 
 type BusinessPickerStripProps = {
@@ -14,8 +15,12 @@ export function BusinessPickerStrip({
   categoryId,
   currentBusinessId,
 }: BusinessPickerStripProps) {
-  const { data: businessesPage, isLoading } = useListBusinesses({ categoryId });
-  const businesses = businessesPage?.items;
+  const { setListParams, items: businesses, isLoading } = useBusinesses();
+
+  useLayoutEffect(() => {
+    setListParams({ categoryId });
+    return () => setListParams(undefined);
+  }, [categoryId, setListParams]);
 
   const items =
     businesses?.map((b) => ({

@@ -1,5 +1,6 @@
 'use client';
 
+import { useLayoutEffect } from 'react';
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
@@ -8,12 +9,16 @@ import Chip from '@mui/material/Chip';
 import CircularProgress from '@mui/material/CircularProgress';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
-import { useListCategories } from '@/hooks/api/categories';
+import { useCategories } from '@/contexts';
 import { TeLlevoClass } from '@/theme/teLlevoClasses';
 
 export function CategoriesSection() {
-  const { data: categoriesPage, isLoading, error } = useListCategories();
-  const categories = categoriesPage?.items;
+  const { setListParams, items: categories, isLoading, error } = useCategories();
+
+  useLayoutEffect(() => {
+    setListParams(undefined);
+    return () => setListParams(undefined);
+  }, [setListParams]);
 
   if (isLoading) {
     return (

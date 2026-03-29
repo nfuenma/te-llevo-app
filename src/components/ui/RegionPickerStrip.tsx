@@ -1,7 +1,7 @@
 'use client';
 
-import { useMemo } from 'react';
-import { useListRegions } from '@/hooks/api/regions';
+import { useLayoutEffect, useMemo } from 'react';
+import { useRegions } from '@/contexts';
 import { RegionsAvatarStrip } from '@/components/ui/RegionsAvatarStrip';
 
 type RegionPickerStripProps = {
@@ -9,8 +9,12 @@ type RegionPickerStripProps = {
 };
 
 export function RegionPickerStrip({ currentRegionId }: RegionPickerStripProps) {
-  const { data: regionsPage, isLoading } = useListRegions();
-  const regions = regionsPage?.items;
+  const { setListParams, items: regions, isLoading } = useRegions();
+
+  useLayoutEffect(() => {
+    setListParams(undefined);
+    return () => setListParams(undefined);
+  }, [setListParams]);
 
   const items = useMemo(
     () =>

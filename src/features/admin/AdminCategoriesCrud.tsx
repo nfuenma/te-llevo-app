@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useLayoutEffect, useState } from 'react';
 import { useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import Button from '@mui/material/Button';
@@ -26,12 +26,7 @@ import Typography from '@mui/material/Typography';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
-import {
-  useListCategories,
-  useCreateCategory,
-  useUpdateCategory,
-  useDeleteCategory,
-} from '@/hooks/api/categories';
+import { useCategories } from '@/contexts';
 import type { CategoryWithCount } from '@/lib/sdk/types';
 
 type FormState = { id: string | null; name: string; tags: string; image: string };
@@ -51,11 +46,19 @@ export function AdminCategoriesCrud() {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
-  const { data: categoriesPage, isLoading } = useListCategories();
-  const categories = categoriesPage?.items;
-  const createMutation = useCreateCategory();
-  const updateMutation = useUpdateCategory();
-  const deleteMutation = useDeleteCategory();
+  const {
+    setListParams,
+    items: categories,
+    isLoading,
+    createCategory: createMutation,
+    updateCategory: updateMutation,
+    deleteCategory: deleteMutation,
+  } = useCategories();
+
+  useLayoutEffect(() => {
+    setListParams(undefined);
+    return () => setListParams(undefined);
+  }, [setListParams]);
 
   const handleOpenCreate = () => {
     setForm(emptyForm);

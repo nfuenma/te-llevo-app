@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useLayoutEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
@@ -27,13 +27,7 @@ import Box from '@mui/material/Box';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
-import {
-  useListBusinesses,
-  useCreateBusiness,
-  useUpdateBusiness,
-  useDeleteBusiness,
-} from '@/hooks/api/businesses';
-import { useListCategories as useCategoriesList } from '@/hooks/api/categories';
+import { useBusinesses, useCategories } from '@/contexts';
 import { canCreateBusiness } from '@/lib/auth/roles';
 import type { BusinessWithRelations } from '@/lib/sdk/types';
 
@@ -65,13 +59,25 @@ export function AdminNegociosCrud() {
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const showCreateButton = canCreateBusiness(session?.user?.roles);
 
-  const { data: businessesPage, isLoading } = useListBusinesses();
-  const { data: categoriesPage } = useCategoriesList();
-  const businesses = businessesPage?.items;
-  const categories = categoriesPage?.items;
-  const createMutation = useCreateBusiness();
-  const updateMutation = useUpdateBusiness();
-  const deleteMutation = useDeleteBusiness();
+  const {
+    setListParams: setBusinessesListParams,
+    items: businesses,
+    isLoading,
+    createBusiness: createMutation,
+    updateBusiness: updateMutation,
+    deleteBusiness: deleteMutation,
+  } = useBusinesses();
+  const { setListParams: setCategoriesListParams, items: categories } = useCategories();
+
+  useLayoutEffect(() => {
+    setBusinessesListParams(undefined);
+    return () => setBusinessesListParams(undefined);
+  }, [setBusinessesListParams]);
+
+  useLayoutEffect(() => {
+    setCategoriesListParams(undefined);
+    return () => setCategoriesListParams(undefined);
+  }, [setCategoriesListParams]);
 
   const handleOpenCreate = () => {
     setForm(emptyForm);

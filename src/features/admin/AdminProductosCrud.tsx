@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useLayoutEffect, useState } from 'react';
 import { useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import Button from '@mui/material/Button';
@@ -30,14 +30,7 @@ import Box from '@mui/material/Box';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
-import {
-  useListProducts,
-  useCreateProduct,
-  useUpdateProduct,
-  useDeleteProduct,
-} from '@/hooks/api/products';
-import { useListBusinesses } from '@/hooks/api/businesses';
-import { useListProductCategories } from '@/hooks/api/product-categories';
+import { useProducts, useBusinesses, useProductCategories } from '@/contexts';
 import type { ProductWithBusiness } from '@/lib/sdk/types';
 
 type FormState = {
@@ -66,15 +59,31 @@ export function AdminProductosCrud() {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
-  const { data: productsPage, isLoading } = useListProducts();
-  const { data: businessesPage } = useListBusinesses();
-  const { data: productCategoriesPage } = useListProductCategories(form.businessId || null);
-  const products = productsPage?.items;
-  const businesses = businessesPage?.items;
-  const productCategories = productCategoriesPage?.items;
-  const createMutation = useCreateProduct();
-  const updateMutation = useUpdateProduct();
-  const deleteMutation = useDeleteProduct();
+  const {
+    setListParams: setProductsListParams,
+    items: products,
+    isLoading,
+    createProduct: createMutation,
+    updateProduct: updateMutation,
+    deleteProduct: deleteMutation,
+  } = useProducts();
+  const { setListParams: setBusinessesListParams, items: businesses } = useBusinesses();
+  const { setListBusinessId, items: productCategories } = useProductCategories();
+
+  useLayoutEffect(() => {
+    setProductsListParams(undefined);
+    return () => setProductsListParams(undefined);
+  }, [setProductsListParams]);
+
+  useLayoutEffect(() => {
+    setBusinessesListParams(undefined);
+    return () => setBusinessesListParams(undefined);
+  }, [setBusinessesListParams]);
+
+  useEffect(() => {
+    setListBusinessId(form.businessId || null);
+    return () => setListBusinessId(null);
+  }, [form.businessId, setListBusinessId]);
 
   const handleOpenCreate = () => {
     setForm({

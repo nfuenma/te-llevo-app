@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState, type ChangeEvent } from 'react';
+import { useLayoutEffect, useRef, useState, type ChangeEvent } from 'react';
 import { useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import Button from '@mui/material/Button';
@@ -28,13 +28,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import Alert from '@mui/material/Alert';
-import {
-  useListRegions,
-  useCreateRegion,
-  useUpdateRegion,
-  useDeleteRegion,
-} from '@/hooks/api/regions';
-import { useListCategories } from '@/hooks/api/categories';
+import { useRegions, useCategories } from '@/contexts';
 import type { RegionWithCategories } from '@/lib/sdk/types';
 import { apiConfig } from '@/lib/sdk/config';
 
@@ -56,13 +50,25 @@ export function AdminRegionesCrud() {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
-  const { data: regionsPage, isLoading } = useListRegions();
-  const { data: categoriesPage } = useListCategories();
-  const regions = regionsPage?.items;
-  const categories = categoriesPage?.items;
-  const createMutation = useCreateRegion();
-  const updateMutation = useUpdateRegion();
-  const deleteMutation = useDeleteRegion();
+  const {
+    setListParams: setRegionsListParams,
+    items: regions,
+    isLoading,
+    createRegion: createMutation,
+    updateRegion: updateMutation,
+    deleteRegion: deleteMutation,
+  } = useRegions();
+  const { setListParams: setCategoriesListParams, items: categories } = useCategories();
+
+  useLayoutEffect(() => {
+    setRegionsListParams(undefined);
+    return () => setRegionsListParams(undefined);
+  }, [setRegionsListParams]);
+
+  useLayoutEffect(() => {
+    setCategoriesListParams(undefined);
+    return () => setCategoriesListParams(undefined);
+  }, [setCategoriesListParams]);
 
   const uploadUrl = `${apiConfig.baseUrl}/api/upload/regions`;
 

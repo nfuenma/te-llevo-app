@@ -13,7 +13,7 @@ import type { ListPaginationParams, PaginatedResult, Product, ProductWithBusines
 
 export const productsKeys = {
   all: ['products'] as const,
-  list: (params?: ListParams) =>
+  list: (params?: ProductsListParams) =>
     [
       ...productsKeys.all,
       'list',
@@ -25,9 +25,9 @@ export const productsKeys = {
   detail: (id: string) => [...productsKeys.all, 'detail', id] as const,
 };
 
-type ListParams = { businessId?: string; categoryId?: string } & ListPaginationParams;
+export type ProductsListParams = { businessId?: string; categoryId?: string } & ListPaginationParams;
 
-async function fetchList(params?: ListParams): Promise<PaginatedResult<ProductWithBusiness>> {
+async function fetchList(params?: ProductsListParams): Promise<PaginatedResult<ProductWithBusiness>> {
   const url = new URL('/api/products', window.location.origin);
   if (params?.businessId) url.searchParams.set('businessId', params.businessId);
   if (params?.categoryId) url.searchParams.set('categoryId', params.categoryId);
@@ -77,7 +77,7 @@ async function removeProduct(id: string) {
 }
 
 export function useListProducts(
-  params?: ListParams,
+  params?: ProductsListParams,
   options?: Omit<
     UseQueryOptions<PaginatedResult<ProductWithBusiness>>,
     'queryKey' | 'queryFn'

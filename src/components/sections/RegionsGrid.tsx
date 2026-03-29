@@ -1,16 +1,21 @@
 'use client';
 
+import { useLayoutEffect } from 'react';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import CircularProgress from '@mui/material/CircularProgress';
 import Typography from '@mui/material/Typography';
-import { useListRegions } from '@/hooks/api/regions';
+import { useRegions } from '@/contexts';
 import { ItemCard } from '@/components/ui/ItemCard';
 import { TeLlevoClass } from '@/theme/teLlevoClasses';
 
 export function RegionsGrid() {
-  const { data: regionsPage, isLoading, error } = useListRegions();
-  const regions = regionsPage?.items;
+  const { setListParams, items: regions, isLoading, error } = useRegions();
+
+  useLayoutEffect(() => {
+    setListParams(undefined);
+    return () => setListParams(undefined);
+  }, [setListParams]);
 
   if (isLoading) {
     return (

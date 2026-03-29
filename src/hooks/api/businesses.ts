@@ -18,7 +18,7 @@ import type {
 
 export const businessesKeys = {
   all: ['businesses'] as const,
-  list: (params?: ListParams) =>
+  list: (params?: BusinessesListParams) =>
     [
       ...businessesKeys.all,
       'list',
@@ -29,9 +29,9 @@ export const businessesKeys = {
   detail: (id: string) => [...businessesKeys.all, 'detail', id] as const,
 };
 
-type ListParams = { categoryId?: string } & ListPaginationParams;
+export type BusinessesListParams = { categoryId?: string } & ListPaginationParams;
 
-async function fetchList(params?: ListParams): Promise<PaginatedResult<BusinessWithRelations>> {
+async function fetchList(params?: BusinessesListParams): Promise<PaginatedResult<BusinessWithRelations>> {
   const url = new URL('/api/businesses', window.location.origin);
   if (params?.categoryId) url.searchParams.set('categoryId', params.categoryId);
   applyListPaginationToSearchParams(url.searchParams, params);
@@ -72,7 +72,7 @@ async function removeBusiness(id: string) {
 }
 
 export function useListBusinesses(
-  params?: ListParams,
+  params?: BusinessesListParams,
   options?: Omit<
     UseQueryOptions<PaginatedResult<BusinessWithRelations>>,
     'queryKey' | 'queryFn'

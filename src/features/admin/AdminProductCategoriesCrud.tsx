@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useLayoutEffect, useState } from 'react';
 import { useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import Button from '@mui/material/Button';
@@ -30,15 +30,7 @@ import Box from '@mui/material/Box';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
-import {
-  useListBusinesses,
-} from '@/hooks/api/businesses';
-import {
-  useListProductCategories,
-  useCreateProductCategory,
-  useUpdateProductCategory,
-  useDeleteProductCategory,
-} from '@/hooks/api/product-categories';
+import { useBusinesses, useProductCategories } from '@/contexts';
 import type { ProductCategory } from '@/lib/sdk/types';
 
 type FormState = {
@@ -62,15 +54,27 @@ export function AdminProductCategoriesCrud() {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
-  const { data: businessesPage, isLoading: loadingBusinesses } = useListBusinesses();
-  const businesses = businessesPage?.items;
+  const { setListParams: setBusinessesListParams, items: businesses, isLoading: loadingBusinesses } =
+    useBusinesses();
   const selectedBusinessId = pickedBusinessId ?? businesses?.[0]?.id ?? '';
-  const { data: productCategoriesPage, isLoading: loadingCategories } =
-    useListProductCategories(selectedBusinessId || null);
-  const productCategories = productCategoriesPage?.items;
-  const createMutation = useCreateProductCategory();
-  const updateMutation = useUpdateProductCategory();
-  const deleteMutation = useDeleteProductCategory();
+  const {
+    setListBusinessId,
+    items: productCategories,
+    isLoading: loadingCategories,
+    createProductCategory: createMutation,
+    updateProductCategory: updateMutation,
+    deleteProductCategory: deleteMutation,
+  } = useProductCategories();
+
+  useLayoutEffect(() => {
+    setBusinessesListParams(undefined);
+    return () => setBusinessesListParams(undefined);
+  }, [setBusinessesListParams]);
+
+  useEffect(() => {
+    setListBusinessId(selectedBusinessId || null);
+    return () => setListBusinessId(null);
+  }, [selectedBusinessId, setListBusinessId]);
 
   const handleOpenCreate = () => {
     setForm({

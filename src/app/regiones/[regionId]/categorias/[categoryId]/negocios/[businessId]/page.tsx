@@ -1,14 +1,12 @@
 'use client';
 
+import { useLayoutEffect } from 'react';
 import { useParams } from 'next/navigation';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import CircularProgress from '@mui/material/CircularProgress';
 import Typography from '@mui/material/Typography';
-import { useListProducts } from '@/hooks/api/products';
-import { useRegion } from '@/hooks/api/regions';
-import { useCategory } from '@/hooks/api/categories';
-import { useBusiness } from '@/hooks/api/businesses';
+import { useProducts, useRegion, useCategory, useBusiness } from '@/contexts';
 import { ItemCard } from '@/components/ui/ItemCard';
 import { BusinessPickerStrip } from '@/components/ui/BusinessPickerStrip';
 import { CatalogLayout } from '@/components/layouts/CatalogLayout';
@@ -22,8 +20,12 @@ export default function BusinessProductsPage() {
   const { data: region } = useRegion(regionId);
   const { data: category } = useCategory(categoryId);
   const { data: business } = useBusiness(businessId);
-  const { data: productsPage, isLoading, error } = useListProducts({ businessId });
-  const products = productsPage?.items;
+  const { setListParams, items: products, isLoading, error } = useProducts();
+
+  useLayoutEffect(() => {
+    setListParams({ businessId });
+    return () => setListParams(undefined);
+  }, [businessId, setListParams]);
 
   const regionName = region?.name ?? 'Región';
   const categoryName = category?.name ?? 'Categoría';

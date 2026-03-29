@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useLayoutEffect, useState } from 'react';
 import { useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import Button from '@mui/material/Button';
@@ -39,15 +39,7 @@ import Accordion from '@mui/material/Accordion';
 import AccordionSummary from '@mui/material/AccordionSummary';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import TextField from '@mui/material/TextField';
-import { useListUsers, useUpdateUser } from '@/hooks/api/users';
-import {
-  useListRoles,
-  useCreateRole,
-  useUpdateRole,
-  useDeleteRole,
-  type RoleOption,
-} from '@/hooks/api/roles';
-import { useListBusinesses } from '@/hooks/api/businesses';
+import { useUsers, useRoles, useBusinesses, type RoleOption } from '@/contexts';
 import type { UserWithRolesAndBusinesses } from '@/lib/sdk/types';
 
 export function AdminUsuariosCrud() {
@@ -63,16 +55,35 @@ export function AdminUsuariosCrud() {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
-  const { data: usersPage, isLoading } = useListUsers();
-  const { data: rolesPage } = useListRoles();
-  const { data: businessesPage } = useListBusinesses();
-  const users = usersPage?.items;
-  const roles = rolesPage?.items;
-  const businesses = businessesPage?.items;
-  const updateMutation = useUpdateUser();
-  const createRoleMutation = useCreateRole();
-  const updateRoleMutation = useUpdateRole();
-  const deleteRoleMutation = useDeleteRole();
+  const {
+    setListParams: setUsersListParams,
+    items: users,
+    isLoading,
+    updateUser: updateMutation,
+  } = useUsers();
+  const {
+    setListParams: setRolesListParams,
+    items: roles,
+    createRole: createRoleMutation,
+    updateRole: updateRoleMutation,
+    deleteRole: deleteRoleMutation,
+  } = useRoles();
+  const { setListParams: setBusinessesListParams, items: businesses } = useBusinesses();
+
+  useLayoutEffect(() => {
+    setUsersListParams(undefined);
+    return () => setUsersListParams(undefined);
+  }, [setUsersListParams]);
+
+  useLayoutEffect(() => {
+    setRolesListParams(undefined);
+    return () => setRolesListParams(undefined);
+  }, [setRolesListParams]);
+
+  useLayoutEffect(() => {
+    setBusinessesListParams(undefined);
+    return () => setBusinessesListParams(undefined);
+  }, [setBusinessesListParams]);
 
   const handleOpenEdit = (user: UserWithRolesAndBusinesses) => {
     setSelectedUser(user);

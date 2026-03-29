@@ -1,8 +1,7 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
-import { keepPreviousData } from '@tanstack/react-query';
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
@@ -10,7 +9,7 @@ import TextField from '@mui/material/TextField';
 import InputAdornment from '@mui/material/InputAdornment';
 import Button from '@mui/material/Button';
 import SearchIcon from '@mui/icons-material/Search';
-import { useListRegions } from '@/hooks/api/regions';
+import { useRegions } from '@/contexts';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { TeLlevoClass } from '@/theme/teLlevoClasses';
 import { RegionsAvatarStrip } from '@/components/ui/RegionsAvatarStrip';
@@ -25,12 +24,13 @@ export function HomePageClient() {
   const [regionSearch, setRegionSearch] = useState('');
   const debouncedSearch = useDebouncedValue(regionSearch, SEARCH_DEBOUNCE_MS);
   const backendQ = debouncedSearch.trim();
-  const listParams = backendQ ? { q: backendQ } : undefined;
 
-  const { data: regionsPage, isLoading, isFetching, error } = useListRegions(listParams, {
-    placeholderData: keepPreviousData,
-  });
-  const regions = regionsPage?.items;
+  const { setListParams, items: regions, isLoading, isFetching, error } = useRegions();
+
+  useEffect(() => {
+    setListParams(backendQ ? { q: backendQ } : undefined);
+    return () => setListParams(undefined);
+  }, [backendQ, setListParams]);
 
   const sortedRegions = useMemo(
     () => (regions ? [...regions].sort((a, b) => a.name.localeCompare(b.name, 'es')) : []),

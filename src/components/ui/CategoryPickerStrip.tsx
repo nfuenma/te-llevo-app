@@ -1,6 +1,6 @@
 'use client';
 
-import { useRegion } from '@/hooks/api/regions';
+import { useRegion } from '@/contexts';
 import { MiniCardHorizontalStrip } from '@/components/ui/MiniCardHorizontalStrip';
 
 type CategoryPickerStripProps = {

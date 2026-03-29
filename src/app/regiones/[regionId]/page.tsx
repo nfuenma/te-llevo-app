@@ -7,7 +7,7 @@ import Button from '@mui/material/Button';
 import CircularProgress from '@mui/material/CircularProgress';
 import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
-import { useRegion } from '@/hooks/api/regions';
+import { useRegion } from '@/contexts';
 import { RegionPickerStrip } from '@/components/ui/RegionPickerStrip';
 import { CategoryBentoGrid } from '@/components/sections/CategoryBentoGrid';
 import { FeaturedPromoCard } from '@/components/sections/FeaturedPromoCard';
