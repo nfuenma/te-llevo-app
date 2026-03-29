@@ -27,76 +27,85 @@ function fluidRem(minRem: number, maxRem: number): string {
   return `clamp(${minRem}rem, calc(${minRem}rem + (${delta}) * ((100vw - ${minV}px) / ${range}px)), ${maxRem}rem)`;
 }
 
-const ff = themeConfig.fontFamily.primary;
+const headline = themeConfig.fontFamily.primary;
+const body = themeConfig.fontFamily.secondary;
 
-const variant = (fontSize: string) => ({
-  fontFamily: ff,
+const variantBody = (fontSize: string) => ({
+  fontFamily: body,
+  fontSize,
+});
+
+const variantHeadline = (fontSize: string) => ({
+  fontFamily: headline,
   fontSize,
 });
 
 export const typography: TypographyVariantsOptions = {
-  fontFamily: ff,
+  fontFamily: body,
   h1: {
-    ...variant(fluidRem(2, 3.5)),
-    lineHeight: 1.15,
-    fontWeight: 600,
+    ...variantHeadline(fluidRem(2, 3.5)),
+    lineHeight: 1.12,
+    fontWeight: 800,
+    letterSpacing: -0.02,
   },
   h2: {
-    ...variant(fluidRem(1.75, 2.75)),
-    lineHeight: 1.2,
-    fontWeight: 600,
+    ...variantHeadline(fluidRem(1.75, 2.75)),
+    lineHeight: 1.15,
+    fontWeight: 800,
+    letterSpacing: -0.02,
   },
   h3: {
-    ...variant(fluidRem(1.5, 2.25)),
-    lineHeight: 1.25,
-    fontWeight: 600,
+    ...variantHeadline(fluidRem(1.5, 2.25)),
+    lineHeight: 1.2,
+    fontWeight: 700,
   },
   h4: {
-    ...variant(fluidRem(1.35, 2.125)),
+    ...variantHeadline(fluidRem(1.35, 2.125)),
     lineHeight: 1.235,
-    fontWeight: 600,
+    fontWeight: 700,
   },
   h5: {
-    ...variant(fluidRem(1.2, 1.5)),
+    ...variantHeadline(fluidRem(1.2, 1.5)),
     lineHeight: 1.334,
-    fontWeight: 600,
+    fontWeight: 700,
   },
   h6: {
-    ...variant(fluidRem(1.1, 1.25)),
-    lineHeight: 1.4,
-    fontWeight: 600,
+    ...variantHeadline(fluidRem(1.1, 1.25)),
+    lineHeight: 1.35,
+    fontWeight: 700,
   },
   subtitle1: {
-    ...variant(fluidRem(1, 1.125)),
+    ...variantBody(fluidRem(1, 1.125)),
     lineHeight: 1.5,
   },
   subtitle2: {
-    ...variant(fluidRem(0.875, 1)),
+    ...variantBody(fluidRem(0.875, 1)),
     lineHeight: 1.5,
     fontWeight: 500,
   },
   body1: {
-    ...variant(fluidRem(0.9375, 1.0625)),
+    ...variantBody(fluidRem(0.9375, 1.0625)),
     lineHeight: 1.5,
   },
   body2: {
-    ...variant(fluidRem(0.8125, 0.9375)),
+    ...variantBody(fluidRem(0.8125, 0.9375)),
     lineHeight: 1.43,
   },
   button: {
-    ...variant(fluidRem(0.8125, 0.9375)),
+    ...variantBody(fluidRem(0.8125, 0.9375)),
     lineHeight: 1.75,
-    fontWeight: 500,
+    fontWeight: 600,
     textTransform: 'none' as const,
   },
   caption: {
-    ...variant(fluidRem(0.75, 0.8125)),
+    ...variantBody(fluidRem(0.75, 0.8125)),
     lineHeight: 1.4,
   },
   overline: {
-    ...variant(fluidRem(0.625, 0.75)),
+    ...variantBody(fluidRem(0.625, 0.75)),
     lineHeight: 2,
-    fontWeight: 500,
+    fontWeight: 600,
+    letterSpacing: '0.12em',
     textTransform: 'uppercase' as const,
   },
 };

@@ -65,8 +65,10 @@ export function AdminNegociosCrud() {
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const showCreateButton = canCreateBusiness(session?.user?.roles);
 
-  const { data: businesses, isLoading } = useListBusinesses();
-  const { data: categories } = useCategoriesList();
+  const { data: businessesPage, isLoading } = useListBusinesses();
+  const { data: categoriesPage } = useCategoriesList();
+  const businesses = businessesPage?.items;
+  const categories = categoriesPage?.items;
   const createMutation = useCreateBusiness();
   const updateMutation = useUpdateBusiness();
   const deleteMutation = useDeleteBusiness();

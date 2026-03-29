@@ -3,8 +3,10 @@
 import { useMemo } from 'react';
 import { ThemeProvider as MuiThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
+import GlobalStyles from '@mui/material/GlobalStyles';
 import { ThemeModeProvider, useThemeMode } from './ThemeModeProvider';
 import { createAppTheme } from './create-theme';
+import { getTeLlevoGlobalClassStyles } from './teLlevoGlobalClassStyles';
 
 function InnerThemeProvider({ children }: { children: React.ReactNode }) {
   const { mode } = useThemeMode();
@@ -12,6 +14,7 @@ function InnerThemeProvider({ children }: { children: React.ReactNode }) {
   return (
     <MuiThemeProvider theme={theme}>
       <CssBaseline />
+      <GlobalStyles styles={getTeLlevoGlobalClassStyles(theme)} />
       {children}
     </MuiThemeProvider>
   );

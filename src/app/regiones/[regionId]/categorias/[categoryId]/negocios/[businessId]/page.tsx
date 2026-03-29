@@ -22,7 +22,8 @@ export default function BusinessProductsPage() {
   const { data: region } = useRegion(regionId);
   const { data: category } = useCategory(categoryId);
   const { data: business } = useBusiness(businessId);
-  const { data: products, isLoading, error } = useListProducts({ businessId });
+  const { data: productsPage, isLoading, error } = useListProducts({ businessId });
+  const products = productsPage?.items;
 
   const regionName = region?.name ?? 'Región';
   const categoryName = category?.name ?? 'Categoría';

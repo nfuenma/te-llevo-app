@@ -6,13 +6,15 @@ import CircularProgress from '@mui/material/CircularProgress';
 import Typography from '@mui/material/Typography';
 import { useListRegions } from '@/hooks/api/regions';
 import { ItemCard } from '@/components/ui/ItemCard';
+import { TeLlevoClass } from '@/theme/teLlevoClasses';
 
 export function RegionsGrid() {
-  const { data: regions, isLoading, error } = useListRegions();
+  const { data: regionsPage, isLoading, error } = useListRegions();
+  const regions = regionsPage?.items;
 
   if (isLoading) {
     return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', py: 6 }}>
+      <Box className={TeLlevoClass.loadingCenterSpacious}>
         <CircularProgress />
       </Box>
     );
@@ -20,7 +22,7 @@ export function RegionsGrid() {
 
   if (error) {
     return (
-      <Typography color="error" sx={{ py: 3 }}>
+      <Typography color="error" className={TeLlevoClass.pageMessage}>
         No se pudieron cargar las regiones.
       </Typography>
     );
@@ -28,7 +30,7 @@ export function RegionsGrid() {
 
   if (!regions?.length) {
     return (
-      <Typography color="text.secondary" sx={{ py: 4 }}>
+      <Typography color="text.secondary" className={TeLlevoClass.pageMessage}>
         Aún no hay regiones.
       </Typography>
     );
@@ -38,11 +40,7 @@ export function RegionsGrid() {
     <Grid container spacing={3}>
       {regions.map((region) => (
         <Grid key={region.id} size={{ xs: 6, sm: 4, md: 4 }}>
-          <ItemCard
-            href={`/regiones/${region.id}`}
-            title={region.name}
-            image={region.image}
-          />
+          <ItemCard href={`/regiones/${region.id}`} title={region.name} image={region.image} />
         </Grid>
       ))}
     </Grid>

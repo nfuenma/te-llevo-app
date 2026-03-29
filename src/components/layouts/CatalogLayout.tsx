@@ -5,6 +5,7 @@ import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
 import Breadcrumbs from '@mui/material/Breadcrumbs';
+import { TeLlevoClass } from '@/theme/teLlevoClasses';
 
 type BreadcrumbItem = { label: string; href?: string };
 
@@ -16,8 +17,8 @@ type CatalogLayoutProps = {
 
 export function CatalogLayout({ title, breadcrumbs, children }: CatalogLayoutProps) {
   return (
-    <Container maxWidth="lg" sx={{ py: 3 }}>
-      <Box sx={{ mb: 3, display: 'flex', flexDirection: 'column', gap: 1 }}>
+    <Container maxWidth="lg" className={TeLlevoClass.catalogLayoutContainer}>
+      <Box className={TeLlevoClass.catalogLayoutHeader}>
         <Typography variant="h4" component="h1">
           {title}
         </Typography>

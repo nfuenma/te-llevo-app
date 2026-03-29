@@ -55,9 +55,11 @@ export function ItemCard({ href, title, image }: ItemCardProps) {
     flexDirection: 'column' as const,
     p: 1,
     boxSizing: 'border-box' as const,
-    transition: 'box-shadow 0.2s',
+    // Solo enlaces: feedback de hover (variant outlined no eleva en el tema global).
     ...(href && {
-      '&:hover': { boxShadow: 2 },
+      '@media (hover: hover)': {
+        '&:hover': { boxShadow: 2 },
+      },
     }),
   };
 

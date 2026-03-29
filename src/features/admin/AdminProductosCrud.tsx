@@ -66,9 +66,12 @@ export function AdminProductosCrud() {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
-  const { data: products, isLoading } = useListProducts();
-  const { data: businesses } = useListBusinesses();
-  const { data: productCategories } = useListProductCategories(form.businessId || null);
+  const { data: productsPage, isLoading } = useListProducts();
+  const { data: businessesPage } = useListBusinesses();
+  const { data: productCategoriesPage } = useListProductCategories(form.businessId || null);
+  const products = productsPage?.items;
+  const businesses = businessesPage?.items;
+  const productCategories = productCategoriesPage?.items;
   const createMutation = useCreateProduct();
   const updateMutation = useUpdateProduct();
   const deleteMutation = useDeleteProduct();

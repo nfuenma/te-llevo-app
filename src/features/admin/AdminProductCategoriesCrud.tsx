@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import Button from '@mui/material/Button';
@@ -58,19 +58,16 @@ const emptyForm: FormState = {
 export function AdminProductCategoriesCrud() {
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState<FormState>(emptyForm);
-  const [selectedBusinessId, setSelectedBusinessId] = useState<string>('');
+  const [pickedBusinessId, setPickedBusinessId] = useState<string | undefined>(undefined);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
-  const { data: businesses, isLoading: loadingBusinesses } = useListBusinesses();
-  const { data: productCategories, isLoading: loadingCategories } =
+  const { data: businessesPage, isLoading: loadingBusinesses } = useListBusinesses();
+  const businesses = businessesPage?.items;
+  const selectedBusinessId = pickedBusinessId ?? businesses?.[0]?.id ?? '';
+  const { data: productCategoriesPage, isLoading: loadingCategories } =
     useListProductCategories(selectedBusinessId || null);
-
-  useEffect(() => {
-    if (businesses?.length && !selectedBusinessId) {
-      setSelectedBusinessId(businesses[0].id);
-    }
-  }, [businesses, selectedBusinessId]);
+  const productCategories = productCategoriesPage?.items;
   const createMutation = useCreateProductCategory();
   const updateMutation = useUpdateProductCategory();
   const deleteMutation = useDeleteProductCategory();
@@ -143,7 +140,7 @@ export function AdminProductCategoriesCrud() {
           <Select
             value={selectedBusinessId}
             label="Negocio"
-            onChange={(e) => setSelectedBusinessId(e.target.value)}
+            onChange={(e) => setPickedBusinessId(e.target.value)}
           >
             {businesses?.map((b) => (
               <MenuItem key={b.id} value={b.id}>

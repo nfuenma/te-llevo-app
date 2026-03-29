@@ -1,26 +1,33 @@
 'use client';
 
+import { useMemo } from 'react';
 import { useListRegions } from '@/hooks/api/regions';
-import { MiniCardHorizontalStrip } from '@/components/ui/MiniCardHorizontalStrip';
+import { RegionsAvatarStrip } from '@/components/ui/RegionsAvatarStrip';
 
 type RegionPickerStripProps = {
   currentRegionId: string;
 };
 
 export function RegionPickerStrip({ currentRegionId }: RegionPickerStripProps) {
-  const { data: regions, isLoading } = useListRegions();
+  const { data: regionsPage, isLoading } = useListRegions();
+  const regions = regionsPage?.items;
 
-  const items =
-    regions?.map((r) => ({
-      id: r.id,
-      name: r.name,
-      image: r.image,
-    })) ?? [];
+  const items = useMemo(
+    () =>
+      regions
+        ? [...regions].sort((a, b) => a.name.localeCompare(b.name)).map((r) => ({
+            id: r.id,
+            name: r.name,
+            image: r.image,
+          }))
+        : [],
+    [regions]
+  );
 
   return (
-    <MiniCardHorizontalStrip
+    <RegionsAvatarStrip
       items={items}
-      currentId={currentRegionId}
+      selectedId={currentRegionId}
       getHref={(id) => `/regiones/${id}`}
       ariaLabel="Cambiar de región"
       isLoading={isLoading}

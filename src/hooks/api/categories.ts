@@ -7,18 +7,30 @@ import {
   type UseQueryOptions,
   type UseMutationOptions,
 } from '@tanstack/react-query';
+import { applyListPaginationToSearchParams, DEFAULT_PAGE, LIST_DEFAULT_PAGE_SIZE } from '@/lib/api/pagination';
 import { sdkClient } from '@/lib/sdk/client';
-import type { Category, CategoryWithCount } from '@/lib/sdk/types';
+import type { Category, CategoryWithCount, ListPaginationParams, PaginatedResult } from '@/lib/sdk/types';
 
 export const categoriesKeys = {
   all: ['categories'] as const,
-  list: (params?: { categoryId?: string }) =>
-    [...categoriesKeys.all, 'list', params] as const,
+  list: (pagination?: ListPaginationParams) =>
+    [
+      ...categoriesKeys.all,
+      'list',
+      pagination?.page ?? DEFAULT_PAGE,
+      pagination?.pageSize ?? LIST_DEFAULT_PAGE_SIZE,
+    ] as const,
   detail: (id: string) => [...categoriesKeys.all, 'detail', id] as const,
 };
 
-async function fetchList(): Promise<CategoryWithCount[]> {
-  const { data } = await sdkClient.get<CategoryWithCount[]>('/api/categories');
+async function fetchList(
+  pagination?: ListPaginationParams
+): Promise<PaginatedResult<CategoryWithCount>> {
+  const url = new URL('/api/categories', window.location.origin);
+  applyListPaginationToSearchParams(url.searchParams, pagination);
+  const { data } = await sdkClient.get<PaginatedResult<CategoryWithCount>>(
+    url.pathname + url.search
+  );
   return data;
 }
 
@@ -45,11 +57,15 @@ async function remove(id: string) {
 }
 
 export function useListCategories(
-  options?: Omit<UseQueryOptions<CategoryWithCount[]>, 'queryKey' | 'queryFn'>
+  pagination?: ListPaginationParams,
+  options?: Omit<
+    UseQueryOptions<PaginatedResult<CategoryWithCount>>,
+    'queryKey' | 'queryFn'
+  >
 ) {
   return useQuery({
-    queryKey: categoriesKeys.list(),
-    queryFn: fetchList,
+    queryKey: categoriesKeys.list(pagination),
+    queryFn: () => fetchList(pagination),
     ...options,
   });
 }

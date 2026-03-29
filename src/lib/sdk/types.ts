@@ -7,9 +7,15 @@ import type {
   ProductCategory,
   Prisma,
 } from '@prisma/client';
+import type {
+  PaginatedResult,
+  PaginationMeta,
+  ListPaginationParams,
+} from '@/lib/api/pagination';
 
 // Re-export base Prisma types
 export type { Category, Business, Product, User, Region, ProductCategory };
+export type { PaginatedResult, PaginationMeta, ListPaginationParams };
 
 export type ProductCategoryWithBusiness = ProductCategory;
 

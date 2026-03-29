@@ -3,15 +3,25 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth/options';
 import { prisma } from '@/lib/db/prisma';
 import { canManageCatalog } from '@/lib/auth/roles';
+import { buildPaginatedResult, parsePaginationParams } from '@/lib/api/pagination';
 import type { CategoryWithCount } from '@/lib/sdk/types';
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
-    const items = await prisma.category.findMany({
-      include: { _count: { select: { businesses: true } } },
-      orderBy: { name: 'asc' },
-    });
-    return NextResponse.json(items as CategoryWithCount[]);
+    const { searchParams } = new URL(request.url);
+    const { page, pageSize, skip, take } = parsePaginationParams(searchParams);
+    const [items, total] = await prisma.$transaction([
+      prisma.category.findMany({
+        skip,
+        take,
+        include: { _count: { select: { businesses: true } } },
+        orderBy: { name: 'asc' },
+      }),
+      prisma.category.count(),
+    ]);
+    return NextResponse.json(
+      buildPaginatedResult(items as CategoryWithCount[], total, page, pageSize)
+    );
   } catch (e) {
     return NextResponse.json(
       { error: e instanceof Error ? e.message : 'Unknown error' },

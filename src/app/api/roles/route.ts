@@ -3,8 +3,9 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth/options';
 import { prisma } from '@/lib/db/prisma';
 import { isSuperadmin } from '@/lib/auth/roles';
+import { buildPaginatedResult, parsePaginationParams } from '@/lib/api/pagination';
 
-export async function GET() {
+export async function GET(request: Request) {
   const session = await getServerSession(authOptions);
   if (!session?.user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -13,11 +14,18 @@ export async function GET() {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   }
   try {
-    const roles = await prisma.role.findMany({
-      select: { id: true, name: true },
-      orderBy: { name: 'asc' },
-    });
-    return NextResponse.json(roles);
+    const { searchParams } = new URL(request.url);
+    const { page, pageSize, skip, take } = parsePaginationParams(searchParams);
+    const [items, total] = await prisma.$transaction([
+      prisma.role.findMany({
+        skip,
+        take,
+        select: { id: true, name: true },
+        orderBy: { name: 'asc' },
+      }),
+      prisma.role.count(),
+    ]);
+    return NextResponse.json(buildPaginatedResult(items, total, page, pageSize));
   } catch (e) {
     return NextResponse.json(
       { error: e instanceof Error ? e.message : 'Unknown error' },

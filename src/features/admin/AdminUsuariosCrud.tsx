@@ -63,9 +63,12 @@ export function AdminUsuariosCrud() {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
-  const { data: users, isLoading } = useListUsers();
-  const { data: roles } = useListRoles();
-  const { data: businesses } = useListBusinesses();
+  const { data: usersPage, isLoading } = useListUsers();
+  const { data: rolesPage } = useListRoles();
+  const { data: businessesPage } = useListBusinesses();
+  const users = usersPage?.items;
+  const roles = rolesPage?.items;
+  const businesses = businessesPage?.items;
   const updateMutation = useUpdateUser();
   const createRoleMutation = useCreateRole();
   const updateRoleMutation = useUpdateRole();

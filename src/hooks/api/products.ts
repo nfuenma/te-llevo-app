@@ -7,23 +7,34 @@ import {
   type UseQueryOptions,
   type UseMutationOptions,
 } from '@tanstack/react-query';
+import { applyListPaginationToSearchParams, DEFAULT_PAGE, LIST_DEFAULT_PAGE_SIZE } from '@/lib/api/pagination';
 import { sdkClient } from '@/lib/sdk/client';
-import type { Product, ProductWithBusiness } from '@/lib/sdk/types';
+import type { ListPaginationParams, PaginatedResult, Product, ProductWithBusiness } from '@/lib/sdk/types';
 
 export const productsKeys = {
   all: ['products'] as const,
-  list: (params?: { businessId?: string; categoryId?: string }) =>
-    [...productsKeys.all, 'list', params] as const,
+  list: (params?: ListParams) =>
+    [
+      ...productsKeys.all,
+      'list',
+      params?.businessId,
+      params?.categoryId,
+      params?.page ?? DEFAULT_PAGE,
+      params?.pageSize ?? LIST_DEFAULT_PAGE_SIZE,
+    ] as const,
   detail: (id: string) => [...productsKeys.all, 'detail', id] as const,
 };
 
-type ListParams = { businessId?: string; categoryId?: string };
+type ListParams = { businessId?: string; categoryId?: string } & ListPaginationParams;
 
-async function fetchList(params?: ListParams): Promise<ProductWithBusiness[]> {
+async function fetchList(params?: ListParams): Promise<PaginatedResult<ProductWithBusiness>> {
   const url = new URL('/api/products', window.location.origin);
   if (params?.businessId) url.searchParams.set('businessId', params.businessId);
   if (params?.categoryId) url.searchParams.set('categoryId', params.categoryId);
-  const { data } = await sdkClient.get<ProductWithBusiness[]>(url.pathname + url.search);
+  applyListPaginationToSearchParams(url.searchParams, params);
+  const { data } = await sdkClient.get<PaginatedResult<ProductWithBusiness>>(
+    url.pathname + url.search
+  );
   return data;
 }
 
@@ -67,7 +78,10 @@ async function removeProduct(id: string) {
 
 export function useListProducts(
   params?: ListParams,
-  options?: Omit<UseQueryOptions<ProductWithBusiness[]>, 'queryKey' | 'queryFn'>
+  options?: Omit<
+    UseQueryOptions<PaginatedResult<ProductWithBusiness>>,
+    'queryKey' | 'queryFn'
+  >
 ) {
   return useQuery({
     queryKey: productsKeys.list(params),

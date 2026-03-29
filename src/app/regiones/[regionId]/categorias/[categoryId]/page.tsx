@@ -19,7 +19,8 @@ export default function CategoryBusinessesPage() {
 
   const { data: region } = useRegion(regionId);
   const { data: category } = useCategory(categoryId);
-  const { data: businesses, isLoading, error } = useListBusinesses({ categoryId });
+  const { data: businessesPage, isLoading, error } = useListBusinesses({ categoryId });
+  const businesses = businessesPage?.items;
 
   const regionName = region?.name ?? 'Región';
   const categoryName = category?.name ?? 'Categoría';

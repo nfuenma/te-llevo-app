@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth/options';
 import { prisma } from '@/lib/db/prisma';
 import { canManageProduct, isSuperadmin } from '@/lib/auth/roles';
+import { buildPaginatedResult, parsePaginationParams } from '@/lib/api/pagination';
 import type { ProductWithBusiness } from '@/lib/sdk/types';
 
 export async function GET(request: Request) {
@@ -32,16 +33,24 @@ export async function GET(request: Request) {
             businessId: managedIds.length === 1 ? managedIds[0] : { in: managedIds },
           }
         : baseWhere;
-    const items = await prisma.product.findMany({
-      where,
-      include: {
-        business: { select: { id: true, name: true, slug: true } },
-        categories: { select: { category: { select: { id: true, name: true } } } },
-        productCategories: { select: { productCategory: { select: { id: true, name: true } } } },
-      },
-      orderBy: { name: 'asc' },
-    });
-    return NextResponse.json(items as ProductWithBusiness[]);
+    const { page, pageSize, skip, take } = parsePaginationParams(searchParams);
+    const [items, total] = await prisma.$transaction([
+      prisma.product.findMany({
+        where,
+        skip,
+        take,
+        include: {
+          business: { select: { id: true, name: true, slug: true } },
+          categories: { select: { category: { select: { id: true, name: true } } } },
+          productCategories: { select: { productCategory: { select: { id: true, name: true } } } },
+        },
+        orderBy: { name: 'asc' },
+      }),
+      prisma.product.count({ where }),
+    ]);
+    return NextResponse.json(
+      buildPaginatedResult(items as ProductWithBusiness[], total, page, pageSize)
+    );
   } catch (e) {
     return NextResponse.json(
       { error: e instanceof Error ? e.message : 'Unknown error' },

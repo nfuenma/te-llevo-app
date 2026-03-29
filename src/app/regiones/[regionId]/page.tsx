@@ -1,14 +1,16 @@
 'use client';
 
 import { useParams } from 'next/navigation';
+import Link from 'next/link';
 import Box from '@mui/material/Box';
-import Grid from '@mui/material/Grid';
+import Button from '@mui/material/Button';
 import CircularProgress from '@mui/material/CircularProgress';
+import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
 import { useRegion } from '@/hooks/api/regions';
-import { ItemCard } from '@/components/ui/ItemCard';
 import { RegionPickerStrip } from '@/components/ui/RegionPickerStrip';
-import { CatalogLayout } from '@/components/layouts/CatalogLayout';
+import { CategoryBentoGrid } from '@/components/sections/CategoryBentoGrid';
+import { FeaturedPromoCard } from '@/components/sections/FeaturedPromoCard';
 
 export default function RegionCategoriesPage() {
   const params = useParams();
@@ -17,48 +19,54 @@ export default function RegionCategoriesPage() {
 
   if (isLoading) {
     return (
-      <CatalogLayout title="Cargando...">
-        <Box sx={{ display: 'flex', justifyContent: 'center', py: 6 }}>
-          <CircularProgress />
-        </Box>
-      </CatalogLayout>
+      <Container maxWidth="md" sx={{ py: 6, display: 'flex', justifyContent: 'center' }}>
+        <CircularProgress />
+      </Container>
     );
   }
 
   if (error || !region) {
     return (
-      <CatalogLayout title="Región">
+      <Container maxWidth="sm" sx={{ py: 4 }}>
         <Typography color="error">No se encontró la región.</Typography>
-      </CatalogLayout>
+      </Container>
     );
   }
 
-  const categories = region.categories?.map((rc) => rc.category) ?? [];
+  const categories =
+    region.categories?.map((rc) => rc.category).sort((a, b) => a.name.localeCompare(b.name)) ?? [];
 
   return (
-    <CatalogLayout
-      title={region.name}
-      breadcrumbs={[{ label: region.name }]}
-    >
-      <Typography color="text.secondary" sx={{ mb: 2 }}>
-        Categorías en esta región. Elige una para ver los negocios.
-      </Typography>
+    <Container maxWidth="md" sx={{ px: { xs: 2, sm: 3 }, py: { xs: 1, sm: 2 } }}>
+      <Box sx={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', mb: 1.5, gap: 2 }}>
+        <Typography variant="h5" component="h1" fontWeight={800}>
+          Explora regiones
+        </Typography>
+        <Button
+          component={Link}
+          href="/"
+          size="small"
+          sx={{ color: 'text.secondary', fontWeight: 700, textTransform: 'none', minWidth: 'auto' }}
+        >
+          Ver todas
+        </Button>
+      </Box>
       <RegionPickerStrip currentRegionId={region.id} />
-      {categories.length === 0 ? (
-        <Typography color="text.secondary">No hay categorías en esta región.</Typography>
-      ) : (
-        <Grid container spacing={3}>
-          {categories.map((cat) => (
-            <Grid key={cat.id} size={{ xs: 6, sm: 6, md: 4 }}>
-              <ItemCard
-                href={`/regiones/${regionId}/categorias/${cat.id}`}
-                title={cat.name}
-                image={cat.image}
-              />
-            </Grid>
-          ))}
-        </Grid>
-      )}
-    </CatalogLayout>
+      <Box sx={{ mt: 3, mb: 2 }}>
+        <Typography variant="overline" color="text.secondary" display="block">
+          Descubre
+        </Typography>
+        <Typography variant="h4" component="h2" fontWeight={800}>
+          Categorías en {region.name}
+        </Typography>
+        <Typography color="text.secondary" variant="body2" sx={{ mt: 1 }}>
+          Elige una categoría para ver negocios en {region.name}.
+        </Typography>
+      </Box>
+      <CategoryBentoGrid regionId={region.id} regionName={region.name} categories={categories} />
+      <Box sx={{ mt: 4 }}>
+        <FeaturedPromoCard />
+      </Box>
+    </Container>
   );
 }

@@ -56,8 +56,10 @@ export function AdminRegionesCrud() {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
-  const { data: regions, isLoading } = useListRegions();
-  const { data: categories } = useListCategories();
+  const { data: regionsPage, isLoading } = useListRegions();
+  const { data: categoriesPage } = useListCategories();
+  const regions = regionsPage?.items;
+  const categories = categoriesPage?.items;
   const createMutation = useCreateRegion();
   const updateMutation = useUpdateRegion();
   const deleteMutation = useDeleteRegion();

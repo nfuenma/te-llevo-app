@@ -9,16 +9,21 @@ import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
 import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
-import Menu from '@mui/material/Menu';
+import Drawer from '@mui/material/Drawer';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import ListItemButton from '@mui/material/ListItemButton';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import ListItemText from '@mui/material/ListItemText';
+import Divider from '@mui/material/Divider';
 import MenuIcon from '@mui/icons-material/Menu';
-import Container from '@mui/material/Container';
-import Avatar from '@mui/material/Avatar';
-import Button from '@mui/material/Button';
-import Tooltip from '@mui/material/Tooltip';
-import MenuItem from '@mui/material/MenuItem';
-import LoginIcon from '@mui/icons-material/Login';
+import NotificationsNoneRoundedIcon from '@mui/icons-material/NotificationsNoneRounded';
 import DarkModeIcon from '@mui/icons-material/DarkMode';
 import LightModeIcon from '@mui/icons-material/LightMode';
+import LoginIcon from '@mui/icons-material/Login';
+import LogoutIcon from '@mui/icons-material/Logout';
+import AdminPanelSettingsOutlinedIcon from '@mui/icons-material/AdminPanelSettingsOutlined';
+import { TeLlevoClass } from '@/theme/teLlevoClasses';
 import { useThemeMode } from '@/theme';
 
 const pages = [
@@ -30,183 +35,110 @@ export function ResponsiveAppBar() {
   const pathname = usePathname();
   const { data: session, status } = useSession();
   const { mode, toggleMode } = useThemeMode();
-  const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null);
-  const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
+  const [drawerOpen, setDrawerOpen] = React.useState(false);
 
-  const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorElNav(event.currentTarget);
-  };
-  const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorElUser(event.currentTarget);
-  };
-
-  const handleCloseNavMenu = () => {
-    setAnchorElNav(null);
-  };
-
-  const handleCloseUserMenu = () => {
-    setAnchorElUser(null);
-  };
-
-  const handleLogout = () => {
-    handleCloseUserMenu();
-    signOut({ callbackUrl: '/' });
-  };
-
-  // No mostrar AppBar en rutas de admin (tienen su propio shell)
   if (pathname?.startsWith('/admin')) {
     return null;
   }
 
   return (
-    <AppBar position="static">
-      <Container maxWidth="xl">
-        <Toolbar disableGutters>
-          <Typography
-            variant="h6"
-            noWrap
-            component={Link}
-            href="/"
-            sx={{
-              mr: 2,
-              display: { xs: 'none', md: 'flex' },
-              fontWeight: 700,
-              color: 'inherit',
-              textDecoration: 'none',
-            }}
-          >
-            Te Llevo
-          </Typography>
-
-          <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
+    <>
+      <AppBar position="fixed" elevation={0} className={TeLlevoClass.catalogAppBar}>
+        <Toolbar disableGutters className={TeLlevoClass.catalogToolbar}>
+          <Box className={TeLlevoClass.toolbarCluster}>
             <IconButton
               size="large"
-              aria-label="menú de navegación"
-              aria-controls="menu-appbar"
-              aria-haspopup="true"
-              onClick={handleOpenNavMenu}
-              color="inherit"
+              aria-label="Abrir menú"
+              className={TeLlevoClass.appBarIcon}
+              onClick={() => setDrawerOpen(true)}
             >
               <MenuIcon />
             </IconButton>
-            <Menu
-              id="menu-appbar"
-              anchorEl={anchorElNav}
-              anchorOrigin={{
-                vertical: 'bottom',
-                horizontal: 'left',
-              }}
-              keepMounted
-              transformOrigin={{
-                vertical: 'top',
-                horizontal: 'left',
-              }}
-              open={Boolean(anchorElNav)}
-              onClose={handleCloseNavMenu}
-              sx={{ display: { xs: 'block', md: 'none' } }}
-            >
-              {pages.map((page) => (
-                <MenuItem
-                  key={page.href}
-                  component={Link}
-                  href={page.href}
-                  onClick={handleCloseNavMenu}
-                >
-                  <Typography sx={{ textAlign: 'center' }}>{page.label}</Typography>
-                </MenuItem>
-              ))}
-            </Menu>
           </Box>
-          <Typography
-            variant="h6"
-            noWrap
-            component={Link}
-            href="/"
-            sx={{
-              mr: 2,
-              display: { xs: 'flex', md: 'none' },
-              flexGrow: 1,
-              fontWeight: 700,
-              color: 'inherit',
-              textDecoration: 'none',
-            }}
-          >
+
+          <Typography variant="h6" component={Link} href="/" className={TeLlevoClass.brandTitleLink}>
             Te Llevo
           </Typography>
-          <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
-            {pages.map((page) => (
-              <Button
-                key={page.href}
-                component={Link}
-                href={page.href}
-                onClick={handleCloseNavMenu}
-                sx={{ my: 2, color: 'white', display: 'block' }}
-              >
-                {page.label}
-              </Button>
-            ))}
-          </Box>
-          <Box sx={{ flexGrow: 0, display: 'flex', alignItems: 'center', gap: 0.5 }}>
-            <Tooltip title={mode === 'light' ? 'Modo oscuro' : 'Modo claro'}>
-              <IconButton color="inherit" onClick={toggleMode} aria-label={mode === 'light' ? 'Activar modo oscuro' : 'Activar modo claro'}>
-                {mode === 'light' ? <DarkModeIcon /> : <LightModeIcon />}
-              </IconButton>
-            </Tooltip>
-            {status === 'loading' ? null : session?.user ? (
-              <>
-                <Tooltip title="Abrir menú">
-                  <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                    <Avatar
-                      alt={session.user.name ?? 'Usuario'}
-                      src={session.user.image ?? undefined}
-                      sx={{ bgcolor: 'secondary.main' }}
-                    >
-                      {session.user.name?.[0] ?? session.user.email?.[0] ?? '?'}
-                    </Avatar>
-                  </IconButton>
-                </Tooltip>
-                <Menu
-                  sx={{ mt: '45px' }}
-                  id="menu-user"
-                  anchorEl={anchorElUser}
-                  anchorOrigin={{
-                    vertical: 'top',
-                    horizontal: 'right',
-                  }}
-                  keepMounted
-                  transformOrigin={{
-                    vertical: 'top',
-                    horizontal: 'right',
-                  }}
-                  open={Boolean(anchorElUser)}
-                  onClose={handleCloseUserMenu}
-                >
-                  <MenuItem
-                    component={Link}
-                    href="/admin"
-                    onClick={handleCloseUserMenu}
-                  >
-                    <Typography sx={{ textAlign: 'center' }}>Administrar</Typography>
-                  </MenuItem>
-                  <MenuItem onClick={handleLogout}>
-                    <Typography sx={{ textAlign: 'center' }}>Cerrar sesión</Typography>
-                  </MenuItem>
-                </Menu>
-              </>
-            ) : (
-              <Tooltip title="Iniciar sesión">
-                <IconButton
-                  color="inherit"
-                  onClick={() => signIn('google', { callbackUrl: '/' })}
-                  aria-label="Iniciar sesión"
-                >
-                  <LoginIcon />
-                </IconButton>
-              </Tooltip>
-            )}
+
+          <Box className={TeLlevoClass.toolbarCluster}>
+            <IconButton size="large" aria-label="Notificaciones" className={TeLlevoClass.appBarIcon}>
+              <NotificationsNoneRoundedIcon />
+            </IconButton>
           </Box>
         </Toolbar>
-      </Container>
-    </AppBar>
+      </AppBar>
+
+      <Drawer anchor="left" open={drawerOpen} onClose={() => setDrawerOpen(false)}>
+        <Box className={TeLlevoClass.drawerPaper} role="presentation">
+          <Typography variant="subtitle1" className={TeLlevoClass.drawerHeading}>
+            Menú
+          </Typography>
+          <List>
+            {pages.map((p) => (
+              <ListItem key={p.href} disablePadding>
+                <ListItemButton
+                  component={Link}
+                  href={p.href}
+                  selected={pathname === p.href}
+                  onClick={() => setDrawerOpen(false)}
+                >
+                  <ListItemText primary={p.label} />
+                </ListItemButton>
+              </ListItem>
+            ))}
+            <ListItem disablePadding>
+              <ListItemButton onClick={toggleMode}>
+                <ListItemIcon className={TeLlevoClass.drawerListItemIcon}>
+                  {mode === 'light' ? <DarkModeIcon /> : <LightModeIcon />}
+                </ListItemIcon>
+                <ListItemText primary={mode === 'light' ? 'Modo oscuro' : 'Modo claro'} />
+              </ListItemButton>
+            </ListItem>
+          </List>
+          <Divider className={TeLlevoClass.drawerDivider} />
+          {status === 'loading' ? null : session?.user ? (
+            <List>
+              <ListItem disablePadding>
+                <ListItemButton component={Link} href="/admin" onClick={() => setDrawerOpen(false)}>
+                  <ListItemIcon className={TeLlevoClass.drawerListItemIcon}>
+                    <AdminPanelSettingsOutlinedIcon />
+                  </ListItemIcon>
+                  <ListItemText primary="Administrar" />
+                </ListItemButton>
+              </ListItem>
+              <ListItem disablePadding>
+                <ListItemButton
+                  onClick={() => {
+                    setDrawerOpen(false);
+                    void signOut({ callbackUrl: '/' });
+                  }}
+                >
+                  <ListItemIcon className={TeLlevoClass.drawerListItemIcon}>
+                    <LogoutIcon />
+                  </ListItemIcon>
+                  <ListItemText primary="Cerrar sesión" />
+                </ListItemButton>
+              </ListItem>
+            </List>
+          ) : (
+            <List>
+              <ListItem disablePadding>
+                <ListItemButton
+                  onClick={() => {
+                    setDrawerOpen(false);
+                    void signIn('google', { callbackUrl: '/' });
+                  }}
+                >
+                  <ListItemIcon className={TeLlevoClass.drawerListItemIcon}>
+                    <LoginIcon />
+                  </ListItemIcon>
+                  <ListItemText primary="Iniciar sesión" />
+                </ListItemButton>
+              </ListItem>
+            </List>
+          )}
+        </Box>
+      </Drawer>
+    </>
   );
 }

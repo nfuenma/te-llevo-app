@@ -7,19 +7,32 @@ import {
   type UseQueryOptions,
   type UseMutationOptions,
 } from '@tanstack/react-query';
+import { applyListPaginationToSearchParams, DEFAULT_PAGE, LIST_DEFAULT_PAGE_SIZE } from '@/lib/api/pagination';
 import { sdkClient } from '@/lib/sdk/client';
-import type { ProductCategory } from '@/lib/sdk/types';
+import type { ListPaginationParams, PaginatedResult, ProductCategory } from '@/lib/sdk/types';
 
 export const productCategoriesKeys = {
   all: ['product-categories'] as const,
-  list: (businessId: string) =>
-    [...productCategoriesKeys.all, 'list', businessId] as const,
+  list: (businessId: string, pagination?: ListPaginationParams) =>
+    [
+      ...productCategoriesKeys.all,
+      'list',
+      businessId,
+      pagination?.page ?? DEFAULT_PAGE,
+      pagination?.pageSize ?? LIST_DEFAULT_PAGE_SIZE,
+    ] as const,
   detail: (id: string) => [...productCategoriesKeys.all, 'detail', id] as const,
 };
 
-async function fetchList(businessId: string): Promise<ProductCategory[]> {
-  const { data } = await sdkClient.get<ProductCategory[]>(
-    `/api/product-categories?businessId=${encodeURIComponent(businessId)}`
+async function fetchList(
+  businessId: string,
+  pagination?: ListPaginationParams
+): Promise<PaginatedResult<ProductCategory>> {
+  const url = new URL('/api/product-categories', window.location.origin);
+  url.searchParams.set('businessId', businessId);
+  applyListPaginationToSearchParams(url.searchParams, pagination);
+  const { data } = await sdkClient.get<PaginatedResult<ProductCategory>>(
+    url.pathname + url.search
   );
   return data;
 }
@@ -56,14 +69,15 @@ async function removeProductCategory(id: string) {
 
 export function useListProductCategories(
   businessId: string | undefined | null,
+  pagination?: ListPaginationParams,
   options?: Omit<
-    UseQueryOptions<ProductCategory[]>,
+    UseQueryOptions<PaginatedResult<ProductCategory>>,
     'queryKey' | 'queryFn'
   >
 ) {
   return useQuery({
-    queryKey: productCategoriesKeys.list(businessId ?? ''),
-    queryFn: () => fetchList(businessId!),
+    queryKey: productCategoriesKeys.list(businessId ?? '', pagination),
+    queryFn: () => fetchList(businessId!, pagination),
     enabled: Boolean(businessId),
     ...options,
   });
@@ -90,10 +104,7 @@ export function useCreateProductCategory(
   const qc = useQueryClient();
   return useMutation({
     mutationFn: createProductCategory,
-    onSuccess: (_, variables) => {
-      void qc.invalidateQueries({
-        queryKey: productCategoriesKeys.list(variables.businessId),
-      });
+    onSuccess: () => {
       void qc.invalidateQueries({ queryKey: productCategoriesKeys.all });
     },
     ...options,

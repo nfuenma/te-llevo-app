@@ -51,7 +51,8 @@ export function AdminCategoriesCrud() {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
-  const { data: categories, isLoading } = useListCategories();
+  const { data: categoriesPage, isLoading } = useListCategories();
+  const categories = categoriesPage?.items;
   const createMutation = useCreateCategory();
   const updateMutation = useUpdateCategory();
   const deleteMutation = useDeleteCategory();

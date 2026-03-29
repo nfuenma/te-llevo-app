@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth/options';
 import { prisma } from '@/lib/db/prisma';
 import { canManageBusiness } from '@/lib/auth/roles';
+import { buildPaginatedResult, parsePaginationParams } from '@/lib/api/pagination';
 import type { ProductCategoryWithBusiness } from '@/lib/sdk/types';
 
 export async function GET(request: Request) {
@@ -19,11 +20,20 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   }
   try {
-    const items = await prisma.productCategory.findMany({
-      where: { businessId },
-      orderBy: { name: 'asc' },
-    });
-    return NextResponse.json(items as ProductCategoryWithBusiness[]);
+    const { page, pageSize, skip, take } = parsePaginationParams(searchParams);
+    const where = { businessId };
+    const [items, total] = await prisma.$transaction([
+      prisma.productCategory.findMany({
+        where,
+        skip,
+        take,
+        orderBy: { name: 'asc' },
+      }),
+      prisma.productCategory.count({ where }),
+    ]);
+    return NextResponse.json(
+      buildPaginatedResult(items as ProductCategoryWithBusiness[], total, page, pageSize)
+    );
   } catch (e) {
     return NextResponse.json(
       { error: e instanceof Error ? e.message : 'Unknown error' },

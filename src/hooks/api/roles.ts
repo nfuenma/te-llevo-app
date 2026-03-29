@@ -7,18 +7,30 @@ import {
   type UseQueryOptions,
   type UseMutationOptions,
 } from '@tanstack/react-query';
+import { applyListPaginationToSearchParams, DEFAULT_PAGE, LIST_DEFAULT_PAGE_SIZE } from '@/lib/api/pagination';
 import { sdkClient } from '@/lib/sdk/client';
+import type { ListPaginationParams, PaginatedResult } from '@/lib/sdk/types';
 
 export type RoleOption = { id: string; name: string };
 
 export const rolesKeys = {
   all: ['roles'] as const,
-  list: () => [...rolesKeys.all, 'list'] as const,
+  list: (pagination?: ListPaginationParams) =>
+    [
+      ...rolesKeys.all,
+      'list',
+      pagination?.page ?? DEFAULT_PAGE,
+      pagination?.pageSize ?? LIST_DEFAULT_PAGE_SIZE,
+    ] as const,
   detail: (id: string) => [...rolesKeys.all, 'detail', id] as const,
 };
 
-async function fetchRoles(): Promise<RoleOption[]> {
-  const { data } = await sdkClient.get<RoleOption[]>('/api/roles');
+async function fetchRoles(
+  pagination?: ListPaginationParams
+): Promise<PaginatedResult<RoleOption>> {
+  const url = new URL('/api/roles', window.location.origin);
+  applyListPaginationToSearchParams(url.searchParams, pagination);
+  const { data } = await sdkClient.get<PaginatedResult<RoleOption>>(url.pathname + url.search);
   return data;
 }
 
@@ -37,11 +49,12 @@ async function deleteRole(id: string): Promise<void> {
 }
 
 export function useListRoles(
-  options?: Omit<UseQueryOptions<RoleOption[]>, 'queryKey' | 'queryFn'>
+  pagination?: ListPaginationParams,
+  options?: Omit<UseQueryOptions<PaginatedResult<RoleOption>>, 'queryKey' | 'queryFn'>
 ) {
   return useQuery({
-    queryKey: rolesKeys.list(),
-    queryFn: fetchRoles,
+    queryKey: rolesKeys.list(pagination),
+    queryFn: () => fetchRoles(pagination),
     ...options,
   });
 }

@@ -7,27 +7,42 @@ import {
   type UseQueryOptions,
   type UseMutationOptions,
 } from '@tanstack/react-query';
+import { applyListPaginationToSearchParams, DEFAULT_PAGE, LIST_DEFAULT_PAGE_SIZE } from '@/lib/api/pagination';
 import { sdkClient } from '@/lib/sdk/client';
-import type { Business, BusinessWithRelations } from '@/lib/sdk/types';
+import type {
+  Business,
+  BusinessWithRelations,
+  ListPaginationParams,
+  PaginatedResult,
+} from '@/lib/sdk/types';
 
 export const businessesKeys = {
   all: ['businesses'] as const,
-  list: (params?: { categoryId?: string }) =>
-    [...businessesKeys.all, 'list', params] as const,
+  list: (params?: ListParams) =>
+    [
+      ...businessesKeys.all,
+      'list',
+      params?.categoryId,
+      params?.page ?? DEFAULT_PAGE,
+      params?.pageSize ?? LIST_DEFAULT_PAGE_SIZE,
+    ] as const,
   detail: (id: string) => [...businessesKeys.all, 'detail', id] as const,
 };
 
-type ListParams = { categoryId?: string };
+type ListParams = { categoryId?: string } & ListPaginationParams;
 
-async function fetchList(params?: ListParams): Promise<BusinessWithRelations[]> {
+async function fetchList(params?: ListParams): Promise<PaginatedResult<BusinessWithRelations>> {
   const url = new URL('/api/businesses', window.location.origin);
   if (params?.categoryId) url.searchParams.set('categoryId', params.categoryId);
-  const { data } = await sdkClient.get<BusinessWithRelations[]>(url.pathname + url.search);
+  applyListPaginationToSearchParams(url.searchParams, params);
+  const { data } = await sdkClient.get<PaginatedResult<BusinessWithRelations>>(
+    url.pathname + url.search
+  );
   return data;
 }
 
 async function fetchDetail(id: string): Promise<BusinessWithRelations> {
-  const { data } = await sdkClient.get<BusinessWithRelations>(`/businesses/${id}`);
+  const { data } = await sdkClient.get<BusinessWithRelations>(`/api/businesses/${id}`);
   return data;
 }
 
@@ -58,7 +73,10 @@ async function removeBusiness(id: string) {
 
 export function useListBusinesses(
   params?: ListParams,
-  options?: Omit<UseQueryOptions<BusinessWithRelations[]>, 'queryKey' | 'queryFn'>
+  options?: Omit<
+    UseQueryOptions<PaginatedResult<BusinessWithRelations>>,
+    'queryKey' | 'queryFn'
+  >
 ) {
   return useQuery({
     queryKey: businessesKeys.list(params),

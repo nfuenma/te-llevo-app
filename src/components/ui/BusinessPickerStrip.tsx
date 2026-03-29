@@ -14,7 +14,8 @@ export function BusinessPickerStrip({
   categoryId,
   currentBusinessId,
 }: BusinessPickerStripProps) {
-  const { data: businesses, isLoading } = useListBusinesses({ categoryId });
+  const { data: businessesPage, isLoading } = useListBusinesses({ categoryId });
+  const businesses = businessesPage?.items;
 
   const items =
     businesses?.map((b) => ({

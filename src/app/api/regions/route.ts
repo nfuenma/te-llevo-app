@@ -3,18 +3,34 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth/options';
 import { prisma } from '@/lib/db/prisma';
 import { canManageCatalog } from '@/lib/auth/roles';
+import { buildPaginatedResult, parsePaginationParams } from '@/lib/api/pagination';
 import type { RegionWithCategories } from '@/lib/sdk/types';
 
-export async function GET() {
+const regionInclude = {
+  categories: { select: { category: { select: { id: true, name: true, image: true } } } },
+  _count: { select: { categories: true } },
+} as const;
+
+export async function GET(request: Request) {
   try {
-    const items = await prisma.region.findMany({
-      include: {
-        categories: { select: { category: { select: { id: true, name: true, image: true } } } },
-        _count: { select: { categories: true } },
-      },
-      orderBy: { name: 'asc' },
-    });
-    return NextResponse.json(items as RegionWithCategories[]);
+    const { searchParams } = new URL(request.url);
+    const { page, pageSize, skip, take } = parsePaginationParams(searchParams);
+    const q = searchParams.get('q')?.trim() ?? '';
+    const where =
+      q.length > 0 ? { name: { contains: q, mode: 'insensitive' as const } } : undefined;
+    const [items, total] = await prisma.$transaction([
+      prisma.region.findMany({
+        where,
+        skip,
+        take,
+        include: regionInclude,
+        orderBy: { name: 'asc' },
+      }),
+      prisma.region.count({ where }),
+    ]);
+    return NextResponse.json(
+      buildPaginatedResult(items as RegionWithCategories[], total, page, pageSize)
+    );
   } catch (e) {
     return NextResponse.json(
       { error: e instanceof Error ? e.message : 'Unknown error' },
@@ -48,9 +64,7 @@ export async function POST(request: Request) {
               }
             : undefined,
       },
-      include: {
-        categories: { select: { category: { select: { id: true, name: true, image: true } } } },
-      },
+      include: regionInclude,
     });
     return NextResponse.json(created);
   } catch (e) {

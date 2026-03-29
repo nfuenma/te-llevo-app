@@ -9,13 +9,15 @@ import CircularProgress from '@mui/material/CircularProgress';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import { useListCategories } from '@/hooks/api/categories';
+import { TeLlevoClass } from '@/theme/teLlevoClasses';
 
 export function CategoriesSection() {
-  const { data: categories, isLoading, error } = useListCategories();
+  const { data: categoriesPage, isLoading, error } = useListCategories();
+  const categories = categoriesPage?.items;
 
   if (isLoading) {
     return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
+      <Box className={TeLlevoClass.loadingCenter}>
         <CircularProgress />
       </Box>
     );
@@ -23,7 +25,7 @@ export function CategoriesSection() {
 
   if (error) {
     return (
-      <Typography color="error" sx={{ py: 2 }}>
+      <Typography color="error" className={TeLlevoClass.pageMessage}>
         No se pudieron cargar las categorías. Intenta de nuevo.
       </Typography>
     );
@@ -31,42 +33,22 @@ export function CategoriesSection() {
 
   if (!categories?.length) {
     return (
-      <Typography color="text.secondary" sx={{ py: 2 }}>
+      <Typography color="text.secondary" className={TeLlevoClass.pageMessage}>
         Aún no hay categorías.
       </Typography>
     );
   }
 
   return (
-    <Box sx={{ py: 2 }}>
-      <Typography variant="h5" component="h2" gutterBottom>
-        Categorías
-      </Typography>
+    <Box className={TeLlevoClass.catalogList}>
       <Grid container spacing={2}>
         {categories.map((category) => (
           <Grid key={category.id} size={{ xs: 12, sm: 6, md: 4 }}>
-            <Card
-              variant="outlined"
-              sx={{
-                height: '100%',
-                display: 'flex',
-                flexDirection: 'column',
-                transition: 'box-shadow 0.2s',
-                '&:hover': {
-                  boxShadow: 2,
-                },
-              }}
-            >
+            <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
               {category.image ? (
-                <CardMedia
-                  component="img"
-                  height="140"
-                  image={category.image}
-                  alt={category.name}
-                  sx={{ objectFit: 'cover' }}
-                />
+                <CardMedia component="img" height="140" image={category.image} alt={category.name} />
               ) : null}
-              <CardContent sx={{ flexGrow: 1 }}>
+              <CardContent className={TeLlevoClass.catalogCardContent}>
                 <Typography variant="h6" component="h3" gutterBottom>
                   {category.name}
                 </Typography>
@@ -77,21 +59,12 @@ export function CategoriesSection() {
                   </Typography>
                 ) : null}
                 {category.tags?.length > 0 ? (
-                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                  <Box className={TeLlevoClass.chipRow}>
                     {category.tags.slice(0, 5).map((tag) => (
-                      <Chip
-                        key={tag}
-                        label={tag}
-                        size="small"
-                        variant="outlined"
-                      />
+                      <Chip key={tag} label={tag} size="small" variant="outlined" />
                     ))}
                     {category.tags.length > 5 ? (
-                      <Chip
-                        label={`+${category.tags.length - 5}`}
-                        size="small"
-                        variant="outlined"
-                      />
+                      <Chip label={`+${category.tags.length - 5}`} size="small" variant="outlined" />
                     ) : null}
                   </Box>
                 ) : null}

@@ -1,14 +1,14 @@
 /**
- * Paleta basada en:
- * - Principal: #ffd200 (amarillo/dorado)
- * - Secundarios: #ff5200 (naranja), #ffd200, #2dff00 (verde), #00ff52 (verde menta)
- * Light: fondos claros, texto oscuro, colores vivos.
- * Dark: fondos oscuros, texto claro, mismos acentos con buen contraste.
+ * Paleta “Te Llevo”: crema (#fff6e1), amarillo Material (#fdd400), texto oliva (#392e00).
+ * Oscuro: superficies aceituna profunda, mismos acentos.
  */
 export const themeConfig = {
   fontFamily: {
-    primary: '"Inter", "Roboto", "Helvetica", "Arial", sans-serif',
-    secondary: '"Inter", "Roboto", "Helvetica", "Arial", sans-serif',
+    /** Titulares (Plus Jakarta Sans vía next/font en --font-plus-jakarta) */
+    primary:
+      'var(--font-plus-jakarta), "Plus Jakarta Sans", system-ui, "Segoe UI", sans-serif',
+    /** Cuerpo (Inter vía --font-inter) */
+    secondary: 'var(--font-inter), Inter, system-ui, "Segoe UI", sans-serif',
   },
   palette: {
     common: {
@@ -17,38 +17,36 @@ export const themeConfig = {
     },
     /** Acentos espectrales (misma rampa en light/dark; se exponen en `theme.palette`). */
     pickerStripAccents: [
-      '#ff002d',
-      '#ff5200',
-      '#ffd200',
-      '#adff00',
-      '#2dff00',
-      '#00ff53',
-      '#00ffd3',
-      '#00acff',
-      '#002dff',
-      '#5300ff',
+      '#fdd400',
+      '#fae18c',
+      '#ffe796',
+      '#faf763',
+      '#edd374',
+      '#bfac6c',
+      '#86763b',
+      '#6d5a00',
     ] as const,
     light: {
       primary: {
-        main: '#ffd200',
+        main: '#fdd400',
         light: '#ffe566',
-        dark: '#cca300',
-        contrastText: '#1a1a00',
+        dark: '#c9a800',
+        contrastText: '#594a00',
       },
       secondary: {
-        main: '#ff5200',
-        light: '#ff7a33',
-        dark: '#cc4200',
-        contrastText: '#ffffff',
+        main: '#6d5a00',
+        light: '#86763b',
+        dark: '#433700',
+        contrastText: '#fff6e1',
       },
       background: {
-        default: '#fafaf5',
+        default: '#fff6e1',
         paper: '#ffffff',
       },
       text: {
-        primary: 'rgba(0, 0, 0, 0.87)',
-        secondary: 'rgba(0, 0, 0, 0.6)',
-        disabled: 'rgba(0, 0, 0, 0.38)',
+        primary: '#392e00',
+        secondary: '#695b23',
+        disabled: 'rgba(57, 46, 0, 0.38)',
       },
       grey: {
         50: '#fafaf8',
@@ -62,32 +60,32 @@ export const themeConfig = {
         800: '#42423a',
         900: '#21211c',
       },
-      error: { main: '#c62828' },
-      warning: { main: '#ff5200' },
+      error: { main: '#b02500' },
+      warning: { main: '#f5dc81' },
       info: { main: '#008c72' },
-      success: { main: '#00b84a' },
+      success: { main: '#2e7d32' },
     },
     dark: {
       primary: {
-        main: '#ffd200',
+        main: '#fdd400',
         light: '#ffe566',
-        dark: '#e6bd00',
-        contrastText: '#1a1a00',
+        dark: '#c9a800',
+        contrastText: '#433700',
       },
       secondary: {
-        main: '#ff5200',
-        light: '#ff7a33',
-        dark: '#e64a00',
-        contrastText: '#ffffff',
+        main: '#bfac6c',
+        light: '#f5dc81',
+        dark: '#86763b',
+        contrastText: '#130e00',
       },
       background: {
-        default: '#121210',
-        paper: '#1e1e1a',
+        default: '#130e00',
+        paper: '#1f1908',
       },
       text: {
-        primary: '#f5f5f0',
-        secondary: 'rgba(255, 255, 255, 0.7)',
-        disabled: 'rgba(255, 255, 255, 0.5)',
+        primary: '#fff6e1',
+        secondary: 'rgba(255, 246, 225, 0.72)',
+        disabled: 'rgba(255, 246, 225, 0.38)',
       },
       grey: {
         50: '#2a2a26',

@@ -7,17 +7,35 @@ import {
   type UseQueryOptions,
   type UseMutationOptions,
 } from '@tanstack/react-query';
+import { applyListPaginationToSearchParams, DEFAULT_PAGE, LIST_DEFAULT_PAGE_SIZE } from '@/lib/api/pagination';
 import { sdkClient } from '@/lib/sdk/client';
-import type { Region, RegionWithCategories } from '@/lib/sdk/types';
+import type { ListPaginationParams, PaginatedResult, Region, RegionWithCategories } from '@/lib/sdk/types';
+
+export type ListRegionsParams = ListPaginationParams & { q?: string };
 
 export const regionsKeys = {
   all: ['regions'] as const,
-  list: () => [...regionsKeys.all, 'list'] as const,
+  list: (params?: ListRegionsParams) =>
+    [
+      ...regionsKeys.all,
+      'list',
+      params?.page ?? DEFAULT_PAGE,
+      params?.pageSize ?? LIST_DEFAULT_PAGE_SIZE,
+      params?.q?.trim() ?? '',
+    ] as const,
   detail: (id: string) => [...regionsKeys.all, 'detail', id] as const,
 };
 
-async function fetchList(): Promise<RegionWithCategories[]> {
-  const { data } = await sdkClient.get<RegionWithCategories[]>('/api/regions');
+async function fetchList(
+  params?: ListRegionsParams
+): Promise<PaginatedResult<RegionWithCategories>> {
+  const url = new URL('/api/regions', window.location.origin);
+  applyListPaginationToSearchParams(url.searchParams, params);
+  const t = params?.q?.trim();
+  if (t) url.searchParams.set('q', t);
+  const { data } = await sdkClient.get<PaginatedResult<RegionWithCategories>>(
+    url.pathname + url.search
+  );
   return data;
 }
 
@@ -44,11 +62,15 @@ async function removeRegion(id: string) {
 }
 
 export function useListRegions(
-  options?: Omit<UseQueryOptions<RegionWithCategories[]>, 'queryKey' | 'queryFn'>
+  params?: ListRegionsParams,
+  options?: Omit<
+    UseQueryOptions<PaginatedResult<RegionWithCategories>>,
+    'queryKey' | 'queryFn'
+  >
 ) {
   return useQuery({
-    queryKey: regionsKeys.list(),
-    queryFn: fetchList,
+    queryKey: regionsKeys.list(params),
+    queryFn: () => fetchList(params),
     ...options,
   });
 }

@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth/options';
 import { prisma } from '@/lib/db/prisma';
 import { canCreateBusiness, isSuperadmin } from '@/lib/auth/roles';
+import { buildPaginatedResult, parsePaginationParams } from '@/lib/api/pagination';
 import type { BusinessWithRelations } from '@/lib/sdk/types';
 
 export async function GET(request: Request) {
@@ -22,15 +23,24 @@ export async function GET(request: Request) {
     if (onlyManaged && managedIds) {
       where.id = { in: managedIds };
     }
-    const items = await prisma.business.findMany({
-      where: Object.keys(where).length ? where : undefined,
-      include: {
-        categories: { select: { category: { select: { id: true, name: true } } } },
-        _count: { select: { products: true } },
-      },
-      orderBy: { name: 'asc' },
-    });
-    return NextResponse.json(items as BusinessWithRelations[]);
+    const whereClause = Object.keys(where).length ? where : undefined;
+    const { page, pageSize, skip, take } = parsePaginationParams(searchParams);
+    const [items, total] = await prisma.$transaction([
+      prisma.business.findMany({
+        where: whereClause,
+        skip,
+        take,
+        include: {
+          categories: { select: { category: { select: { id: true, name: true } } } },
+          _count: { select: { products: true } },
+        },
+        orderBy: { name: 'asc' },
+      }),
+      prisma.business.count({ where: whereClause }),
+    ]);
+    return NextResponse.json(
+      buildPaginatedResult(items as BusinessWithRelations[], total, page, pageSize)
+    );
   } catch (e) {
     return NextResponse.json(
       { error: e instanceof Error ? e.message : 'Unknown error' },

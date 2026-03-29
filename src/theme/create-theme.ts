@@ -1,7 +1,7 @@
 import { createTheme as muiCreateTheme } from '@mui/material/styles';
 import { getPalette } from './core/palette';
 import { typography } from './core/typography';
-import { getComponents } from './core/components';
+import { getComponents } from './components';
 import { getCustomShadows } from './core/custom-shadows';
 import { lightShadows, darkShadows } from './core/shadows';
 import type { ThemeMode } from './theme-config';
@@ -26,7 +26,7 @@ export function createAppTheme(mode: ThemeMode) {
     palette: { ...palette, mode },
     typography,
     shadows,
-    shape: { borderRadius: 8 },
+    shape: { borderRadius: 4 },
     breakpoints,
   });
 
